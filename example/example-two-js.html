@@ -1,0 +1,663 @@
+<!doctype html>
+<html>
+<head>
+  <title>EXAMPLE</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <script src="https://two.js.org/third-party/url.js"></script>
+  <script src="https://two.js.org/third-party/two.js"></script>
+  <script src="https://two.js.org/third-party/physics.js"></script>
+
+
+  <style>
+    /*#two-1 path:first-child {*/
+    /*  filter: blur(40px);*/
+    /*  height: 10px;*/
+    /*  color: red;*/
+    /*}*/
+
+    .outer {
+      height: 100%;
+      background: black;
+      background: radial-gradient(at center, #04221D, #041411)
+    }
+  </style>
+</head>
+<body>
+<div id="container" class="outer"></div>
+<div
+  class="scripts"
+  style="height: 100%;background: url('./fan.png'); background-position: -20px -400px"
+>
+  <script>
+  const RENDERER_TYPE = 'webgl'
+  // const RENDERER_TYPE = 'canvas'
+  // только в svg работают mouse events
+  // const RENDERER_TYPE = 'svg'
+
+  const container = document.getElementById('container')
+
+  const two = new Two({
+    id: '3e3e3',
+    type: Two.Types[RENDERER_TYPE],
+    fullscreen: true
+  }).appendTo(container)
+
+  const RADIUS = two.height / 3
+  const MASS = 10
+
+  var foreground = two.makeGroup()
+  var background = two.makeGroup()
+
+  // http://jonobr1.com/Physics/#
+  var physics = new Physics()
+
+  function rand (min, max) {
+    return Math.random() * (max - min) + min
+  }
+
+  function randMass () {
+    return Math.random() * 0.2 + 0.4
+  }
+
+  function resizeresize () {
+    foreground.translation.set(two.width / 2, two.height / 2)
+    background.translation.set(two.width / 2, two.height / 2)
+  }
+
+  function scaleVectors (vectors, multiplier) {
+    return vectors.map(v => ({ x: v.x * multiplier, y: v.y * multiplier }))
+  }
+
+  function moveVectors (vectors, stepX, stepY) {
+    return vectors.map(v => ({ x: v.x + stepX, y: v.y + stepY }))
+  }
+
+  function buildCircleVectors (n) {
+    const res = []
+
+    for (let i = 0; i < n; i++) {
+      const pct = i / n
+      const theta = pct * Math.PI * 2
+
+      const x = rand(1.1, 1.3) * Math.cos(theta)
+      const y = rand(1.1, 1.3) * Math.sin(theta)
+
+      res.push({ x, y })
+    }
+
+    return res
+  }
+
+  function buildLineGradient (color1, color2, length) {
+    return two.makeLinearGradient(
+      0,
+      0,
+      length,
+      length,
+      new Two.Stop(0, color1, 1),
+      new Two.Stop(1, color2, 1)
+    )
+  }
+
+  function buildVectorsVariance (vectors, varianceLimits) {
+    const res = []
+
+    for (let i = 0; i < vectors.length; i++) {
+      const { x, y } = vectors[i]
+      const variance = rand(...varianceLimits)
+      const vx = variance * x
+      const vy = variance * y
+      res.push({ x: vx, y: vy })
+    }
+
+    return res
+  }
+
+  function buildFigure (vectors, varianceLimits, strength, drag, rest, scale, maxRotationShift) {
+    const footholds = []
+    const origins = []
+    const springs = []
+    const outlines = []
+
+    const varianceVectors = buildVectorsVariance(vectors, varianceLimits)
+
+    for (let i = 0; i < vectors.length; i++) {
+      const mass = randMass()
+      const { x, y } = vectors[i]
+
+      const origin = physics.makeParticle(mass, x, y)
+      origin.shape = two.makeCircle(origin.position.x, origin.position.y, 10)
+      origin.position = origin.shape.position
+      origin.shape.noStroke().fill = SHOW_POINTS ? 'orange' : 'transparent'
+
+      // const text = new Two.Text(i, origin.position.x , origin.position.y , {})
+      // text.size = 10
+      // text.fill = '#FFFF00'
+      // background.add(text)
+
+      const variance = varianceVectors[i]
+
+      const foothold = physics.makeParticle(mass, variance.x, variance.y)
+      foothold.shape = two.makeCircle(foothold.position.x, foothold.position.y, 5)
+      foothold.position = foothold.shape.position
+      foothold.shape.noStroke().fill = SHOW_POINTS ? 'red' : 'transparent'
+
+      const spring = physics.makeSpring(foothold, origin, strength, drag, rest)
+      // const spring = null
+
+      footholds.push(foothold)
+      origins.push(origin)
+      springs.push(spring)
+    }
+
+    const pointPositions = origins.map(p => p.position)
+
+    const NUMBER_OF_OUTLINES = 10
+    for (let i = 0; i < NUMBER_OF_OUTLINES; i++) {
+      const color = COLORS[Math.floor(rand(0, COLORS.length))]
+      //const color = GRADIENTS_LINES[Math.floor(rand(0, GRADIENTS_LINES.length))]
+      const randScale = rand(...scale)
+      const thickness = rand(0.8, 1.5)
+      const rotationShift = rand(0, maxRotationShift)
+
+      const outline = buildOutlineLine(pointPositions, color, thickness, randScale, rotationShift)
+      outlines.push(outline)
+    }
+
+    const NUMBER_OF_BLURRED_OUTLINES = 3
+    for (let i = 0; i < NUMBER_OF_BLURRED_OUTLINES; i++) {
+      const color = GRADIENTS_BLURRED[Math.floor(rand(0, GRADIENTS_BLURRED.length))]
+      const randScale = rand(...scale)
+      const thickness = rand(8.24, 9.36)
+      const rotationShift = rand(0, maxRotationShift)
+
+      const outline = buildOutlineLine(pointPositions, color, thickness, randScale, rotationShift)
+      outlines.push(outline)
+    }
+
+    return { footholds, origins, springs, outlines }
+  }
+
+  function buildOutlineLine (pointPositions, color, thickness, scale, rotation) {
+    const line = new Two.Path(pointPositions, true, true)
+    line.stroke = color
+    line.fill = 'transparent'
+    line.curved = true
+    line.linewidth = thickness
+    line.scale = scale
+    line.rotation = rotation
+    // line.translation = new Two.Vector(rand(1.1, 1.3), rand(1.1, 1.3))
+
+    return line
+  }
+
+  function randomize (footholds, origins, springs) {
+    const maxMass = Math.max.apply(Math, footholds.map(particle => particle.mass))
+    const minMass = Math.min.apply(Math, footholds.map(particle => particle.mass))
+
+    // footholds.forEach((p, i) => {
+    //   const spring = springs[i]
+    //   spring.constant = spring.constant * rand(1, 1.5)
+    //   p.shape.noStroke().fill = '#AA00FF'
+    // })
+
+    const incrementMass = footholds.filter(p => p.mass === minMass)
+    incrementMass.forEach((p, i) => {
+      //p.mass = p.mass * rand(1.1, 1.5)
+      // p.shape.noStroke().fill = '#FFFF00'
+    })
+
+    const decrementMass = footholds.filter(p => p.mass === maxMass)
+    decrementMass.forEach(p => {
+      //p.mass = p.mass * rand(0.7, 0.9)
+      // p.shape.noStroke().fill = '#FF0000'
+    })
+
+    // TODO: надо менять у вогнутых или выпирающих
+    const i = Math.floor(rand(0, footholds.length))
+    const changePos = [footholds[i]]
+
+    changePos.forEach((p, i) => {
+      //for (i = 0; i < Two.Resolution; i++) {
+      // var pct = i / Two.Resolution
+      // var theta = pct * Math.PI * 2
+      // var ax = rand(1.1, 1.3) * radius * Math.cos(theta)
+      // var ay = rand(1.1, 1.3) * radius * Math.sin(theta)
+
+      // points[i].x = rand(0.95, 1.05) * points[i].x
+      // points[i].y = rand(0.95, 1.05) * points[i].y
+      ///}
+
+      const origin = origins[i]
+      const foothold = footholds[i]
+      // springs[i] = physics.makeSpring(foothold, origin, strength * rand(0.5, 1.1), drag * rand(0.9, 1.1), drag * rand(0.6, 0.9))
+
+      const spring = springs[i]
+      spring.constant = spring.constant * rand(1, 1.2)
+      p.shape.noStroke().fill = 'orange'
+    })
+
+    // console.log('transform', {
+    //   maxMass,
+    //   minMass,
+    //   changePosCount: changePos.length,
+    //   incrementMass: incrementMass.length,
+    //   decrementMass: decrementMass.length
+    // })
+  }
+
+  function transformFigure (sourceOrigins, sourceFootholds, destinationOrigins, destinationFootholds, step) {
+    if (sourceOrigins.length !== destinationOrigins.length || sourceFootholds.length !== destinationFootholds.length) {
+      throw Error('Wrong length')
+    }
+
+    const count = sourceOrigins.length
+    let s, d
+
+    for (let i = 0; i < count; i++) {
+      s = sourceOrigins[i].position
+      d = destinationOrigins[i]
+      if (!s.equals(d)) {
+        s.lerp(d, step)
+      }
+
+      s = sourceFootholds[i].position
+      d = destinationFootholds[i]
+      s.lerp(d, step)
+    }
+
+    // const eps = 0.001
+    // console.log(v, d)
+    // break;
+    //
+    // const dx = d.x - v.x
+    // const dy = d.y - v.y
+    //
+    // if (Math.abs(dx) < eps && Math.abs(dy) < eps) {
+    //   continue
+    // }
+    //
+    // v.x += dx * step
+    // v.y += dy * step
+  }
+
+  const COLORS = [
+    '#05C4EE', '#00E391',
+    '#00E391', '#28FFD8',
+    '#28FFD8', '#28cbff',
+    '#126879', '#042824',
+  ]
+
+  const GRADIENTS_LINES = [
+    buildLineGradient(COLORS[0], COLORS[1], RADIUS * Math.PI * 1),
+    buildLineGradient(COLORS[2], COLORS[3], RADIUS * Math.PI * 1),
+    buildLineGradient(COLORS[3], COLORS[4], RADIUS * Math.PI * 1),
+    buildLineGradient(COLORS[5], COLORS[6], RADIUS * Math.PI * 1),
+  ]
+
+  const GRADIENTS_BLURRED = [
+    buildLineGradient('#05C4EE33', '#00E39122', RADIUS * Math.PI * 0.5),
+    buildLineGradient('#05C4EE33', '#28FFD822', RADIUS * Math.PI * 0.5),
+  ]
+
+  const TRANSFORM_ENABLED = false
+  const SHOW_POINTS = false
+
+  const MOUSE_DIAMETER = 60
+
+  const OUTLINES_CIRCLE_VARIANCE = [0.98, 1.01]
+  const OUTLINES_CIRCLE_SCALE = [0.9, 1.01]
+  const OUTLINES_CIRCLE_MAX_ROTATION_SHIFT = Math.PI / 10
+  const OUTLINES_CIRCLE_STRENGTH = 0.3
+  const OUTLINES_CIRCLE_DRAG = 0.001
+  const OUTLINES_CIRCLE_REST = 0
+  const OUTLINES_CIRCLE_ROTATION = 0.01
+
+  const OUTLINES_FAN_VARIANCE = [0.7, 0.71]
+  const OUTLINES_FAN_SCALE = [1, 1.03]
+  const OUTLINES_FAN_MAX_ROTATION_SHIFT = Math.PI / 35
+  const OUTLINES_FAN_STRENGTH = 0.0
+  const OUTLINES_FAN_DRAG = 0.0
+  const OUTLINES_FAN_REST = 0.0
+  const OUTLINES_FAN_ROTATION = 0
+
+  const OUTLINES_TREE_VARIANCE = [1, 1.1]
+  const OUTLINES_TREE_SCALE = [1, 1.2]
+  const OUTLINES_TREE_MAX_ROTATION_SHIFT = Math.PI / 10
+  const OUTLINES_TREE_STRENGTH = 0.3
+  const OUTLINES_TREE_DRAG = 0.0
+  const OUTLINES_TREE_REST = 0.0
+  const OUTLINES_TREE_ROTATION = 0
+
+  let figureRotation = 0
+  let figureType = 'circle'
+
+  const circleVectors = scaleVectors(buildCircleVectors(31), RADIUS)
+  const fanVectors = scaleVectors(moveVectors([
+    { x: 21.5, y: 5.5 },
+    { x: 23.1, y: 4.2 },
+    { x: 24.3, y: 1.1 },
+    { x: 28, y: -2 }, // 26.5,0
+    { x: 30, y: 0 },
+    { x: 26.2, y: 4 },
+    { x: 24.2, y: 6.2 },
+    { x: 23.7, y: 8 },
+    { x: 23.8, y: 9.5 },
+    { x: 25, y: 11 },
+    { x: 25.5, y: 13 },
+    { x: 26.1, y: 16 },
+    { x: 26.9, y: 18 },
+    { x: 24, y: 18 },
+    { x: 23, y: 14 },
+    { x: 22, y: 11.2 },
+    { x: 21.1, y: 10 },
+    { x: 20, y: 8.2 },
+    { x: 18.7, y: 8 },
+    { x: 17.7, y: 7.9 },
+    { x: 14.5, y: 7.5 },
+    { x: 11, y: 6 },
+    { x: 7, y: 5 },
+    { x: 4, y: 4 },
+    { x: 0, y: 3 },
+    { x: 1.5, y: 1.2 },
+    { x: 4.8, y: 1.8 },
+    { x: 8, y: 3 },
+    { x: 11.8, y: 3.5 },
+    { x: 15, y: 4.2 },
+    { x: 20.1, y: 6 },
+  ], -17, -8), 60)
+
+  const treeVectors = scaleVectors(moveVectors([
+    { x: 21, y: 1 },
+    { x: 23, y: 2 },
+    { x: 24, y: 3.5 },
+    { x: 25, y: 5 },
+    { x: 26.3, y: 6.5 },
+    { x: 26.5, y: 8 },
+    { x: 26.1, y: 9.2 },
+    { x: 26.5, y: 10.5 },
+    { x: 27, y: 12.2 },
+    { x: 26.2, y: 14.2 },
+    { x: 24.8, y: 15.8 },
+    { x: 23.2, y: 15.5 },
+    { x: 22.1, y: 15.8 },
+    { x: 20.9, y: 15.9 },
+    { x: 19.2, y: 16 },
+    { x: 17.5, y: 15.5 },
+    { x: 16.2, y: 14.2 },
+    { x: 15, y: 14 },
+    { x: 13.8, y: 14 },
+    { x: 12.1, y: 13.1 },
+    { x: 11.7, y: 12.1 },
+    { x: 11.9, y: 11 },
+    { x: 12.3, y: 10 },
+    { x: 12.5, y: 9 },
+    { x: 12.4, y: 7.7 },
+    { x: 13.1, y: 6.1 },
+    { x: 14.1, y: 4.9 },
+    { x: 15.2, y: 3.8 },
+    { x: 16.9, y: 2.9 },
+    { x: 18.2, y: 2.2 },
+    { x: 19.8, y: 1.2 },
+  ], -18, -11.5), 35)
+
+  function figureOptions (type) {
+    switch (type) {
+      case 'tree':
+        return {
+          figureVectors: treeVectors,
+          figureScale: OUTLINES_TREE_SCALE,
+          figureMaxRotationShift: OUTLINES_TREE_MAX_ROTATION_SHIFT,
+          figureVariance: OUTLINES_TREE_VARIANCE,
+          figureStrength: OUTLINES_TREE_STRENGTH,
+          figureDrag: OUTLINES_TREE_DRAG,
+          figureRest: OUTLINES_TREE_REST,
+          figureRotation: OUTLINES_TREE_ROTATION,
+        }
+      case 'fan':
+        return {
+          figureVectors: fanVectors,
+          figureScale: OUTLINES_FAN_SCALE,
+          figureMaxRotationShift: OUTLINES_FAN_MAX_ROTATION_SHIFT,
+          figureVariance: OUTLINES_FAN_VARIANCE,
+          figureStrength: OUTLINES_FAN_STRENGTH,
+          figureDrag: OUTLINES_FAN_DRAG,
+          figureRest: OUTLINES_FAN_REST,
+          figureRotation: OUTLINES_FAN_ROTATION,
+        }
+      case 'circle':
+        return {
+          figureVectors: circleVectors,
+          figureScale: OUTLINES_CIRCLE_SCALE,
+          figureMaxRotationShift: OUTLINES_CIRCLE_MAX_ROTATION_SHIFT,
+          figureVariance: OUTLINES_CIRCLE_VARIANCE,
+          figureStrength: OUTLINES_CIRCLE_STRENGTH,
+          figureDrag: OUTLINES_CIRCLE_DRAG,
+          figureRest: OUTLINES_CIRCLE_REST,
+          figureRotation: OUTLINES_CIRCLE_ROTATION,
+        }
+    }
+  }
+
+  const figure1Options = figureOptions(figureType)
+  figureRotation = figure1Options.figureRotation
+
+  const figure1 = buildFigure(
+    figure1Options.figureVectors,
+    figure1Options.figureVariance,
+    figure1Options.figureStrength,
+    figure1Options.figureDrag,
+    figure1Options.figureRest,
+    figure1Options.figureScale,
+    figure1Options.figureMaxRotationShift
+  )
+  figure1.origins.map(origin => {
+    foreground.add(origin.shape)
+  })
+  figure1.footholds.map(foothold => {
+    foreground.add(foothold.shape)
+  })
+  figure1.outlines.map(outline => {
+    foreground.add(outline)
+  })
+
+  let transformSource = figure1
+  let transformDestination = null
+  const TRANSFORM_STEP = 0.1
+
+  const text = new Two.Text(figureType, 50, 50, {})
+  text.size = 15
+  text.fill = '#F00'
+  background.add(text)
+
+  // transforming
+  setInterval(() => {
+    figureType = ['fan', 'tree', 'circle'][Math.floor(rand(0, 3))]
+    text.value = figureType
+
+    if (figureType === 'fan') {
+      foreground.rotation = 0
+    }
+
+    // transformSource.footholds.map(foothold => {
+    //   foreground.remove(foothold.shape)
+    // })
+    // transformSource.outlines.map(outline => {
+    //   foreground.remove(outline)
+    // })
+
+    if (TRANSFORM_ENABLED) {
+      let figure2Options = figureOptions(figureType)
+      figureRotation = figure2Options.figureRotation
+      const tmp1 = buildVectorsVariance(figure2Options.figureVectors, figure2Options.figureVariance)
+      const tmp2 = buildVectorsVariance(figure2Options.figureVectors, figure2Options.figureVariance)
+      transformDestination = { origins: tmp1, footholds: tmp2 }
+    }
+  }, 5000)
+
+  // two.renderer.domElement.style.background = 'black'
+
+  resize()
+
+  setInterval(() => {
+    //randomize(figure1.footholds, figure1.origins, figure1.springs)
+  }, 1000)
+
+  // чтобы elem стал доступен
+  two.update()
+
+  // function drag (e, shape) {
+  //   e.preventDefault()
+  //
+  //   var offset = Two.Vector.add(shape.parent.parent.translation, shape.parent.translation)
+  //   // console.log(offset)
+  //
+  //   var x = e.clientX - offset.x
+  //   var y = e.clientY - offset.y
+  //   shape.translation.set(x, y)
+  // }
+
+  const mouse = physics.makeParticle(20, 0, 0)
+  mouse.shape = two.makeCircle(mouse.position.x, mouse.position.y, MOUSE_DIAMETER)
+  mouse.position = mouse.shape.position
+  mouse.shape.noStroke().fill = SHOW_POINTS ? 'yellow' : 'transparent'
+  background.add(mouse.shape)
+
+  // physics.makeAttraction(anchor, mouse, 50, 1900);
+
+  container.addEventListener('mousemove', function (e) {
+    mouse.position.x = e.clientX - background.translation.x
+    mouse.position.y = e.clientY - background.translation.y
+  }, false)
+
+  for (let i = 0; i < 1; i++) {
+    const origin = figure1.origins[i]
+    const outline = figure1.outlines[i]
+    const spring = figure1.springs[i]
+
+    // physics.makeAttraction(origin, mouse,  10000, 1000)
+
+    // if (origin && origin.shape && origin.shape._renderer) {
+    //   const el = origin.shape._renderer.elem
+    //
+    //   el.addEventListener('mouseover', function (e) {
+    //     const x = e.clientX
+    //     const y = e.clientY
+    //     // const newposX = x + rand(-100, 100)
+    //     // const newposY = y + rand(-100, 100)
+    //
+    //     // spring.constant = spring.constant * rand(1, 1.5)
+    //     origin.shape.position.x = newposX
+    //     origin.shape.position.y = newposY
+    //     // drag(e, origin.shape)
+    //
+    //     origin.shape.noStroke().fill = '#FFF'
+    //     origin.position = origin.shape.position
+    //
+    //     spring.on = false
+    //   }, false)
+    //
+    //   el.addEventListener('mouseout', function () {
+    //     console.log(origin)
+    //   }, false)
+    // }
+  }
+  // foreground._renderer.elem
+  //    .css('cursor', 'pointer')
+  //    .click(function (e) {
+  //      console.log(e)
+  //    })
+
+  const touched = {}
+
+  setInterval(() => {
+    console.log(touched)
+
+    for (let i of Object.keys(touched)) {
+      const b = touched[i].b
+      const c = touched[i].c
+      // b.position.x = touched[i].position.x
+      // b.position.y = touched[i].position.y
+      // footholds.position.x = touched[i].footholdsPositions.x
+      // footholds.position.y = touched[i].footholdsPositions.y
+
+      b.position.lerp(touched[i].position, touched[i].step)
+      c.position.lerp(touched[i].footholdsPositions, touched[i].step)
+
+      touched[i].step += 0.1
+
+      if (touched[i].step >= 1) {
+        delete touched[i]
+      }
+    }
+  }, 100)
+
+  function rotateCoords (cx, cy, x, y, angle) {
+    const radians = (Math.PI / 180) * angle,
+      cos = Math.cos(radians),
+      sin = Math.sin(radians),
+      nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
+      ny = (cos * (y - cy)) - (sin * (x - cx)) + cy
+    return { x: nx, y: ny }
+  }
+
+  // This is like our draw loop
+  physics.onUpdate(function () {
+    for (let i = 0; i < figure1.origins.length; i++) {
+      const origin = figure1.origins[i]
+      const footholds = figure1.footholds[i]
+      const outline = figure1.outlines[i]
+      const spring = figure1.springs[i]
+
+      const a = mouse
+      const b = origin
+      const c = footholds
+
+      const tmp = { position: rotateCoords(two.width / 2, two.height / 2, b.position.x, b.position.y, foreground.rotation) }
+      console.log(tmp)
+      const distance = a.distanceTo(tmp)
+
+      // console.log(origin)
+      //debugger
+
+      if (distance <= MOUSE_DIAMETER) {
+        if (!touched[i]) {
+          touched[i] = {
+            position: { ...origin.position },
+            footholdsPositions: { ...footholds.position },
+            step: 0,
+            returned: false,
+            b,
+            c
+          }
+        }
+
+        const makeup = (MOUSE_DIAMETER / 2)
+        const angle = Math.atan2(b.position.y - a.position.y, b.position.x - a.position.x)
+
+        b.position.x += makeup * Math.cos(angle)
+        b.position.y += makeup * Math.sin(angle)
+        c.position.x += makeup * Math.cos(angle)
+        c.position.y += makeup * Math.sin(angle)
+      }
+    }
+  })
+
+  //physics.play();
+  two
+    .bind('resize', resize)
+    .bind('update', function (frameCount, timeDelta) {
+      physics.update()
+      if (transformSource && transformDestination) {
+        transformFigure(transformSource.origins, transformSource.footholds, transformDestination.origins, transformDestination.footholds, TRANSFORM_STEP)
+      }
+
+      foreground.rotation += figureRotation//  * frameCount
+
+    })
+    .play()
+  </script>
+</div>
+</body>
+</html>
