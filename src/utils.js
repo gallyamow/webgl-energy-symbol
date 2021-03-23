@@ -36,9 +36,10 @@ export function buildVectorsVariance (coords, varianceRange) {
 
   for (let i = 0; i < coords.length; i++) {
     const { x, y } = coords[i]
-    const variance = rand(varianceRange.min, varianceRange.max)
-    const vx = variance * x
-    const vy = variance * y
+    const varianceX = rand(varianceRange.min, varianceRange.max)
+    const vx = x + varianceX
+    const varianceY = rand(varianceRange.min, varianceRange.max)
+    const vy = y + varianceY
     res.push({ x: vx, y: vy })
   }
 

@@ -85,6 +85,8 @@ export default class EnergySymbolScene {
    * @param blurredOutlineThicknessRange
    * @param blurredOutlineRotationRange
    * @param blurredOutlineCount
+   * @param outlineVarianceRange
+   * @param blurredOutlineVarianceRange
    */
   addSymbol (
     symbolKey,
@@ -92,14 +94,14 @@ export default class EnergySymbolScene {
     massRange,
     varianceRange,
     { springStrength, sprintDrag, sprintRest },
-    { outlineColors, outlineScaleRange, outlineThicknessRange, outlineRotationRange, outlineCount },
-    { blurredOutlineColors, blurredOutlineScaleRange, blurredOutlineThicknessRange, blurredOutlineRotationRange, blurredOutlineCount },
+    { outlineColors, outlineVarianceRange, outlineScaleRange, outlineThicknessRange, outlineRotationRange, outlineCount },
+    { blurredOutlineColors, blurredOutlineVarianceRange, blurredOutlineScaleRange, blurredOutlineThicknessRange, blurredOutlineRotationRange, blurredOutlineCount },
   ) {
     const bunches = this.buildFigureBunches(symbolVectors, massRange, varianceRange, springStrength, sprintDrag, sprintRest)
-    const points = bunches.map(p => p.origin.position)
+
     const outlines = [
-      ...this.buildOutlines(points, outlineColors, outlineScaleRange, outlineThicknessRange, outlineRotationRange, outlineCount),
-      ...this.buildOutlines(points, blurredOutlineColors, blurredOutlineScaleRange, blurredOutlineThicknessRange, blurredOutlineRotationRange, blurredOutlineCount)
+      ...this.buildOutlines(bunches, outlineColors, outlineVarianceRange, outlineScaleRange, outlineThicknessRange, outlineRotationRange, outlineCount),
+      ...this.buildOutlines(bunches, blurredOutlineColors, blurredOutlineVarianceRange, blurredOutlineScaleRange, blurredOutlineThicknessRange, blurredOutlineRotationRange, blurredOutlineCount)
     ]
 
     this.figures[symbolKey] = {
@@ -189,13 +191,14 @@ export default class EnergySymbolScene {
     for (let i = 0; i < symbolVectors.length; i++) {
       mass = rand(massRange.min, massRange.max)
       coords = symbolVectors[i]
-      const origin = this.buildParticle(mass, coords.x, coords.y, 'orange')
+      const origin = this.buildParticle(mass, coords.x, coords.y, 'red')
 
       mass = rand(massRange.min, massRange.max)
       coords = varianceVectors[i]
-      const variance = this.buildParticle(mass, coords.x, coords.y, 'red')
+      const variance = this.buildParticle(mass, coords.x, coords.y, 'green')
 
       const spring = this.physics.makeSpring(variance, origin, springStrength, sprintDrag, sprintRest)
+      // const spring = null
 
       res.push({ origin, variance, spring })
     }
@@ -206,14 +209,27 @@ export default class EnergySymbolScene {
   /**
    * @private
    */
-  buildOutlines (points, colorsInfo, scaleRange, thicknessRange, rotationRange, count) {
+  buildOutlines (bunches, colorsInfo, varianceRange, scaleRange, thicknessRange, rotationRange, count) {
+    const points = bunches.map(p => p.origin.position)
+
     const res = []
 
     for (let i = 0; i < count; i++) {
+      // const fixedPoints = points.map(v => {
+      //   // todo: поискать готовое свойство path
+      //   const cl = v.clone()
+      //   cl.add(rand(varianceRange.min, varianceRange.max), rand(varianceRange.min, varianceRange.max))
+      //   return cl
+      // })
+      //
+      // fixedPoints.map((vv, kk) => {
+      //   this.physics.makeSpring(vv, bunches[kk].origin, 0.5, 0, 0)
+      // })
+
       let randColor = colorsInfo[Math.floor(rand(0, colorsInfo.length))]
 
       if (!(randColor instanceof String)) {
-        // gradient
+        // it's a gradient config
         randColor = this.buildLineGradient(randColor.color1, randColor.color2, randColor.width)
       }
 
@@ -235,11 +251,12 @@ export default class EnergySymbolScene {
     const line = new Two.Path(coords, closed, curved)
 
     line.stroke = color
+    line.linewidth = lineWidth
+    line.scale = scale // лучше не стоит
+    line.rotation = rotation
     line.fill = 'transparent'
     line.curved = true
-    line.linewidth = lineWidth
-    line.scale = scale
-    line.rotation = rotation
+    line.miter = 0
 
     return line
   }

@@ -70,7 +70,7 @@ export const VECTORS_TREE = scaleVectors(moveVectors([
   { x: 16.9, y: 2.9 },
   { x: 18.2, y: 2.2 },
   { x: 19.8, y: 1.2 },
-], -15, -10), 25)
+], -14.2, -9), 46)
 
 export const COLORS = [
   '#05C4EE', '#00E391',

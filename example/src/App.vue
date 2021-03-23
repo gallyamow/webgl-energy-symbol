@@ -1,7 +1,5 @@
 <template>
-  <div id="app">
-    <HelloWorld/>
-  </div>
+  <HelloWorld/>
 </template>
 
 <script>
@@ -17,10 +15,14 @@ export default {
 </script>
 
 <style>
-  body {
-    background: grey;
-    overflow: hidden;
+  html, body {
+    height: 100%;
     padding: 0;
     margin: 0;
+  }
+
+  body {
+    background: radial-gradient(at center, #04221D, #041411);
+    overflow: hidden;
   }
 </style>
