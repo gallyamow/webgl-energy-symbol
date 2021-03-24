@@ -239,6 +239,8 @@ export default class EnergySymbolScene {
   buildOutlines (bunches, colorsInfo, varianceRange, scaleRange, thicknessRange, rotationRange, count) {
     const res = []
 
+    // TODO: rm varianceRange
+
     for (let i = 0; i < count; i++) {
       // выбираем случайно из origin и variance
       const randPoints = bunches.map(b => {
@@ -256,7 +258,7 @@ export default class EnergySymbolScene {
       const thickness = rand(thicknessRange.min, thicknessRange.max)
       const rotationShift = rand(rotationRange.min, rotationRange.max)
 
-      const outline = this.buildOutline(randPoints, randColor, thickness, randScale, rotationShift)
+      const outline = this.buildOutline(randPoints, randColor, thickness,  randScale, rotationShift)
       res.push(outline)
     }
 

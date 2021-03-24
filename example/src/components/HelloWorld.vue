@@ -4,7 +4,7 @@
 
 <script>
 import { EnergySymbolScene, rand, moveVectors, scaleVectors } from 'webgl-energy-symbol'
-import { VECTORS_TREE, VECTORS_FAN, VECTORS_CIRCLE, GRADIENTS, GRADIENTS_BLURRED } from './examples'
+import { VECTORS_TREE, VECTORS_FAN, VECTORS_RING, VECTORS_MICRO, GRADIENTS, GRADIENTS_BLURRED } from './examples'
 
 const TRANSFORMING_ENABLED = true
 
@@ -27,27 +27,28 @@ export default {
       },
       {
         outlineColors: GRADIENTS,
-        outlineScaleRange: { min: 1, max: 1 },
+        outlineScaleRange: { min: 0.995, max: 1.005 },
         outlineThicknessRange: { min: 1, max: 1.8 },
-        outlineVarianceRange: { min: -15, max: 15 },
-        outlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
+        outlineVarianceRange: { min: -5, max: 5 },
+        outlineRotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
         outlineCount: 7
       },
       {
         blurredOutlineColors: GRADIENTS_BLURRED,
-        blurredOutlineScaleRange: { min: 1, max: 1 },
+        blurredOutlineScaleRange: { min: 0.995, max: 1.005 },
         blurredOutlineThicknessRange: { min: 9.24, max: 10.36 },
-        blurredOutlineVarianceRange: { min: -15, max: 15 },
-        blurredOutlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
+        blurredOutlineVarianceRange: { min: -10, max: 10 },
+        blurredOutlineRotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
         blurredOutlineCount: 4
       }
     ]
 
     // moving and scaling depends on current size (30 - columns count)
-    const multiplier = window.innerWidth / 30
+    const multiplier = 1 //window.innerWidth / 30
     const SYMBOLS = [
-      moveVectors(scaleVectors(VECTORS_TREE, 0.5 * multiplier), -9 * multiplier, -4 * multiplier),
-      moveVectors(scaleVectors(VECTORS_CIRCLE, 3 * multiplier), 0, 0),
+      moveVectors(scaleVectors(VECTORS_TREE, multiplier), -500, -400),
+      moveVectors(scaleVectors(VECTORS_RING, multiplier), -500, -400),
+      moveVectors(scaleVectors(VECTORS_MICRO, multiplier), -500, -400),
       moveVectors(scaleVectors(VECTORS_FAN, 0.5 * multiplier), -9 * multiplier, -4 * multiplier),
     ]
 
@@ -57,7 +58,7 @@ export default {
 
     if (TRANSFORMING_ENABLED) {
       setInterval(() => {
-        this.energySymbolScene.transformSymbol(SYMBOLS[Math.floor(rand(0, 3))])
+        this.energySymbolScene.transformSymbol(SYMBOLS[Math.floor(rand(0, SYMBOLS.length))])
       }, 2000)
     }
 
@@ -89,7 +90,7 @@ export default {
   .container {
     overflow: hidden;
     height: 100%;
-    /*background: url("../assets/tree-bg.png") no-repeat fixed center center;*/
+    background: url("../assets/tree-bg.png") no-repeat fixed 85% 99%;
     /*background-size: contain;*/
   }
 </style>
