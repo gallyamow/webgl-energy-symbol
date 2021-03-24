@@ -13,7 +13,7 @@ export default {
     /**
      * @type {EnergySymbolScene}
      */
-    this.energySymbolScene = (new EnergySymbolScene(window.innerWidth, window.innerHeight, 50, false))
+    this.energySymbolScene = (new EnergySymbolScene(window.innerWidth, window.innerHeight, 2, false))
   },
 
   mounted () {

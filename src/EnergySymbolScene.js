@@ -15,7 +15,7 @@ export default class EnergySymbolScene {
     this.sceneWidth = sceneWidth
     this.sceneHeight = sceneHeight
     this.mouse = null
-    this.mouseDiameter = mouseDiameter
+    this.mouseDiameter = mouseDiameter * (sceneWidth / 100)
     this.touched = {}
     this.physics = new Physics()
     this.symbol = null
@@ -24,8 +24,8 @@ export default class EnergySymbolScene {
     this.rendered = false
 
     this.canvas = document.createElement('canvas')
-    this.canvas.width = sceneHeight
-    this.canvas.width = sceneHeight
+    this.canvas.width = sceneWidth
+    this.canvas.height = sceneHeight
 
     this.two = new Two({
       type: Two.Types['webgl'],
@@ -283,11 +283,14 @@ export default class EnergySymbolScene {
    * @private
    */
   buildLineGradient (color1, color2, length) {
+    const w = length * this.two.width / 2
+    const h = length * this.two.height / 2
+
     return this.two.makeLinearGradient(
-      0,
-      0,
-      length,
-      length,
+      rand(0, w),
+      rand(0, h),
+      rand(0, w) + rand(0, w),
+      rand(0, h) + rand(0, h),
       new Two.Stop(0, color1, 1),
       new Two.Stop(1, color2, 1)
     )
