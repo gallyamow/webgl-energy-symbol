@@ -136,8 +136,6 @@ export default class EnergySymbolScene {
    */
   resize (width, height) {
     // TODO: throttle
-    console.log({ width, height })
-
     this.sceneWidth = width
     this.sceneHeight = height
 

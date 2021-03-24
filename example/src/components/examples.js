@@ -1,10 +1,8 @@
-import { scaleVectors, buildCircleVectors, moveVectors } from 'webgl-energy-symbol/src/utils'
+import { buildCircleVectors } from 'webgl-energy-symbol/src/utils'
 
-const RADIUS = 250
+export const VECTORS_CIRCLE = buildCircleVectors(31)
 
-export const VECTORS_CIRCLE = scaleVectors(buildCircleVectors(31), RADIUS)
-
-export const VECTORS_FAN = scaleVectors(moveVectors([
+export const VECTORS_FAN = [
   { x: 21.5, y: 5.5 },
   { x: 23.1, y: 4.2 },
   { x: 24.3, y: 1.1 },
@@ -36,9 +34,9 @@ export const VECTORS_FAN = scaleVectors(moveVectors([
   { x: 11.8, y: 3.5 },
   { x: 15, y: 4.2 },
   { x: 20.1, y: 6 },
-], -20, -8), 40)
+]
 
-export const VECTORS_TREE = scaleVectors(moveVectors([
+export const VECTORS_TREE = [
   { x: 21, y: 1 },
   { x: 23, y: 2 },
   { x: 24, y: 3.5 },
@@ -70,7 +68,8 @@ export const VECTORS_TREE = scaleVectors(moveVectors([
   { x: 16.9, y: 2.9 },
   { x: 18.2, y: 2.2 },
   { x: 19.8, y: 1.2 },
-], -20.2, -9), 40)
+]
+//, -20.2, -9), 40)
 
 export const COLORS = [
   '#00E391', '#00E391',
@@ -80,13 +79,13 @@ export const COLORS = [
 ]
 
 export const GRADIENTS = [
-  { color1: COLORS[0], color2: COLORS[1], width: RADIUS * Math.PI },
-  { color1: COLORS[2], color2: COLORS[3], width: RADIUS * Math.PI },
-  { color1: COLORS[3], color2: COLORS[4], width: RADIUS * Math.PI },
-  { color1: COLORS[5], color2: COLORS[6], width: RADIUS * Math.PI }
+  { color1: COLORS[0], color2: COLORS[1], width: 0.8 },
+  { color1: COLORS[2], color2: COLORS[3], width: 0.8 },
+  { color1: COLORS[3], color2: COLORS[4], width: 0.8 },
+  { color1: COLORS[5], color2: COLORS[6], width: 0.8 }
 ]
 
 export const GRADIENTS_BLURRED = [
-  { color1: '#00E39133', color2: '#00E39122', width: RADIUS * Math.PI * 0.5 },
-  { color1: '#00E39133', color2: '#28FFD822', width: RADIUS * Math.PI * 0.5 },
+  { color1: '#00E39133', color2: '#00E39122', width: 0.6 },
+  { color1: '#00E39133', color2: '#28FFD822', width: 0.6 },
 ]

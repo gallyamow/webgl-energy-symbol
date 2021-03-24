@@ -3,8 +3,10 @@
 </template>
 
 <script>
-import { EnergySymbolScene, rand } from 'webgl-energy-symbol'
+import { EnergySymbolScene, rand, moveVectors, scaleVectors } from 'webgl-energy-symbol'
 import { VECTORS_TREE, VECTORS_FAN, VECTORS_CIRCLE, GRADIENTS, GRADIENTS_BLURRED } from './examples'
+
+const TRANSFORMING_ENABLED = true
 
 export default {
   created () {
@@ -41,19 +43,23 @@ export default {
       }
     ]
 
+    // moving and scaling depends on current size (30 - columns count)
+    const multiplier = window.innerWidth / 30
     const SYMBOLS = [
-      VECTORS_TREE,
-      VECTORS_CIRCLE,
-      VECTORS_FAN,
+      moveVectors(scaleVectors(VECTORS_TREE, 0.5 * multiplier), -9 * multiplier, -4 * multiplier),
+      moveVectors(scaleVectors(VECTORS_CIRCLE, 3 * multiplier), 0, 0),
+      moveVectors(scaleVectors(VECTORS_FAN, 0.5 * multiplier), -9 * multiplier, -4 * multiplier),
     ]
 
     // noinspection JSCheckFunctionSignatures
     this.energySymbolScene.render(this.$refs.container)
     this.energySymbolScene.showSymbol(SYMBOLS[0], ...OPTIONS)
 
-    setInterval(() => {
-      this.energySymbolScene.transformSymbol(SYMBOLS[Math.floor(rand(0, 3))])
-    }, 2000)
+    if (TRANSFORMING_ENABLED) {
+      setInterval(() => {
+        this.energySymbolScene.transformSymbol(SYMBOLS[Math.floor(rand(0, 3))])
+      }, 2000)
+    }
 
     const eventTarget = this.energySymbolScene.getEventsTarget()
     eventTarget.addEventListener('ready', this.onReady)
