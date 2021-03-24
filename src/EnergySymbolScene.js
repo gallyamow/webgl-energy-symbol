@@ -21,10 +21,11 @@ export default class EnergySymbolScene {
     this.symbol = null
     this.transformingSymbol = null
     this.transformingStep = 0
+    this.rendered = false
 
-    // const canvas = document.createElement('canvas');
-    // canvas.width = sceneHeight
-    // canvas.width = sceneHeight
+    this.canvas = document.createElement('canvas')
+    this.canvas.width = sceneHeight
+    this.canvas.width = sceneHeight
 
     this.two = new Two({
       type: Two.Types['webgl'],
@@ -32,7 +33,7 @@ export default class EnergySymbolScene {
       fitted: true,
       width: sceneWidth,
       height: sceneHeight,
-      // domElement: canvas
+      domElement: this.canvas
     })
     this.foreground = this.two.makeGroup()
     this.background = this.two.makeGroup()
@@ -45,6 +46,7 @@ export default class EnergySymbolScene {
     this.container = container
 
     this.resize(this.sceneWidth, this.sceneHeight)
+    // using our canvas
     this.two.appendTo(this.container)
 
     this.eventTarget.dispatchEvent(new CustomEvent('ready'))
@@ -64,7 +66,10 @@ export default class EnergySymbolScene {
     this.physics.onUpdate(this.onPhysicsUpdate.bind(this))
     this.physics.play()
 
+    // todo: throttle + move  update loop?
     this.repairTouchedTimer = setInterval(this.repairTouched.bind(this), 100)
+
+    this.rendered = true
 
     return this
   }
@@ -114,7 +119,6 @@ export default class EnergySymbolScene {
 
   /**
    * @param {Coords[]} symbolVectors
-   * @param {number} step
    */
   transformSymbol (symbolVectors) {
     if (symbolVectors.length !== this.symbol.bunches.length) {
@@ -129,14 +133,26 @@ export default class EnergySymbolScene {
    * @param {number} width
    * @param {number} height
    * @return {EnergySymbolScene}
-   *
    */
   resize (width, height) {
+    // TODO: throttle
+    console.log({ width, height })
+
     this.sceneWidth = width
     this.sceneHeight = height
 
+    this.container.width = this.sceneWidth
+    this.container.height = this.sceneHeight
+
+    this.canvas.width = this.sceneWidth
+    this.canvas.height = this.sceneHeight
+
     this.foreground.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
     this.background.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
+
+    if (this.rendered) {
+      this.two.update()
+    }
 
     return this
   }
@@ -224,20 +240,8 @@ export default class EnergySymbolScene {
    */
   buildOutlines (bunches, colorsInfo, varianceRange, scaleRange, thicknessRange, rotationRange, count) {
     const res = []
-    //const points = bunches.map(p => p.origin.position)
 
     for (let i = 0; i < count; i++) {
-      // const fixedPoints = points.map(v => {
-      //   // todo: поискать готовое свойство path
-      //   const cl = v //v.clone()
-      //   cl.add(rand(varianceRange.min, varianceRange.max), rand(varianceRange.min, varianceRange.max))
-      //   return cl
-      // })
-
-      // fixedPoints.map((vv, kk) => {
-      //   this.physics.makeSpring(vv, bunches[kk].origin, 0.5, 0, 0)
-      // })
-
       // выбираем случайно из origin и variance
       const randPoints = bunches.map(b => {
         return (rand(-1, 1) > 0) ? b.origin.position : b.variance.position
@@ -271,16 +275,8 @@ export default class EnergySymbolScene {
     line.linewidth = lineWidth
     line.scale = scale // лучше не стоит
     line.rotation = rotation
-    // line.translation = [new Two.Vector(rotation, rotation), new Two.Vector(rotation, rotation)]
     line.fill = 'transparent'
     line.curved = true
-    // line.miter = 0.5
-
-    // coords.forEach(function(v) {
-    //   // var v = new Two.Vector(x, y);
-    //   v.position = new Two.Vector().copy(v);
-    //   line.vertices.push(v);
-    // });
 
     return line
   }
@@ -304,7 +300,7 @@ export default class EnergySymbolScene {
    */
   buildParticle (mass, x, y, color) {
     const p = this.physics.makeParticle(mass, x, y)
-    p.shape = this.two.makeCircle(p.position.x, p.position.y, 5)
+    p.shape = this.two.makeCircle(p.position.x, p.position.y, 10)
     p.position = p.shape.position
     p.shape.noStroke().fill = this.debugMode ? color : 'transparent'
 

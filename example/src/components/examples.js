@@ -1,6 +1,6 @@
 import { scaleVectors, buildCircleVectors, moveVectors } from 'webgl-energy-symbol/src/utils'
 
-const RADIUS = 280
+const RADIUS = 250
 
 export const VECTORS_CIRCLE = scaleVectors(buildCircleVectors(31), RADIUS)
 
@@ -36,7 +36,7 @@ export const VECTORS_FAN = scaleVectors(moveVectors([
   { x: 11.8, y: 3.5 },
   { x: 15, y: 4.2 },
   { x: 20.1, y: 6 },
-], -17, -8), 46)
+], -20, -8), 40)
 
 export const VECTORS_TREE = scaleVectors(moveVectors([
   { x: 21, y: 1 },
@@ -70,7 +70,7 @@ export const VECTORS_TREE = scaleVectors(moveVectors([
   { x: 16.9, y: 2.9 },
   { x: 18.2, y: 2.2 },
   { x: 19.8, y: 1.2 },
-], -14.2, -9), 46)
+], -20.2, -9), 40)
 
 export const COLORS = [
   '#00E391', '#00E391',

@@ -11,97 +11,48 @@ export default {
     /**
      * @type {EnergySymbolScene}
      */
-    this.energySymbolScene = (new EnergySymbolScene(1920, 1080, 50, false))
+    this.energySymbolScene = (new EnergySymbolScene(window.innerWidth, window.innerHeight, 50, false))
   },
 
   mounted () {
+    const OPTIONS = [
+      { min: 5, max: 8 },
+      { min: -15, max: 15 },
+      {
+        springStrength: 0.6,
+        sprintDrag: 0,
+        sprintRest: 2
+      },
+      {
+        outlineColors: GRADIENTS,
+        outlineScaleRange: { min: 1, max: 1 },
+        outlineThicknessRange: { min: 1, max: 1.8 },
+        outlineVarianceRange: { min: -15, max: 15 },
+        outlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
+        outlineCount: 7
+      },
+      {
+        blurredOutlineColors: GRADIENTS_BLURRED,
+        blurredOutlineScaleRange: { min: 1, max: 1 },
+        blurredOutlineThicknessRange: { min: 9.24, max: 10.36 },
+        blurredOutlineVarianceRange: { min: -15, max: 15 },
+        blurredOutlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
+        blurredOutlineCount: 4
+      }
+    ]
+
     const SYMBOLS = [
-      [
-        VECTORS_TREE,
-        { min: 5, max: 8 },
-        { min: -15, max: 15 },
-        {
-          springStrength: 0.6,
-          sprintDrag: 0,
-          sprintRest: 1
-        },
-        {
-          outlineColors: GRADIENTS,
-          outlineScaleRange: { min: 1, max: 1 },
-          outlineThicknessRange: { min: 1, max: 1.8 },
-          outlineVarianceRange: { min: -15, max: 15 },
-          outlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
-          outlineCount: 7
-        },
-        {
-          blurredOutlineColors: GRADIENTS_BLURRED,
-          blurredOutlineScaleRange: { min: 1, max: 1 },
-          blurredOutlineThicknessRange: { min: 8.24, max: 9.36 },
-          blurredOutlineVarianceRange: { min: -15, max: 15 },
-          blurredOutlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
-          blurredOutlineCount: 4
-        }
-      ],
-      [
-        VECTORS_CIRCLE,
-        { min: 0.4, max: 0.6 },
-        { min: 0.98, max: 1.01 },
-        {
-          springStrength: 0.3,
-          sprintDrag: 0.001,
-          sprintRest: 0
-        },
-        {
-          outlineColors: GRADIENTS,
-          outlineScaleRange: { min: 1, max: 1 },
-          outlineThicknessRange: { min: 1, max: 1.8 },
-          outlineVarianceRange: { min: -15, max: 15 },
-          outlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
-          outlineCount: 7
-        },
-        {
-          blurredOutlineColors: GRADIENTS_BLURRED,
-          blurredOutlineScaleRange: { min: 1, max: 1 },
-          blurredOutlineThicknessRange: { min: 8.24, max: 9.36 },
-          blurredOutlineVarianceRange: { min: -15, max: 15 },
-          blurredOutlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
-          blurredOutlineCount: 4
-        }
-      ],
-      [
-        VECTORS_FAN,
-        { min: 0.4, max: 0.6 },
-        { min: 0.98, max: 1.01 },
-        {
-          springStrength: 0.3,
-          sprintDrag: 0.001,
-          sprintRest: 0
-        },
-        {
-          outlineColors: GRADIENTS,
-          outlineScaleRange: { min: 1, max: 1 },
-          outlineThicknessRange: { min: 1, max: 1.8 },
-          outlineVarianceRange: { min: -15, max: 15 },
-          outlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
-          outlineCount: 7
-        },
-        {
-          blurredOutlineColors: GRADIENTS_BLURRED,
-          blurredOutlineScaleRange: { min: 1, max: 1 },
-          blurredOutlineThicknessRange: { min: 8.24, max: 9.36 },
-          blurredOutlineVarianceRange: { min: -15, max: 15 },
-          blurredOutlineRotationRange: { min: -Math.PI / 40, max: Math.PI / 40 },
-          blurredOutlineCount: 4
-        }
-      ]
+      VECTORS_TREE,
+      VECTORS_CIRCLE,
+      VECTORS_FAN,
     ]
 
     // noinspection JSCheckFunctionSignatures
     this.energySymbolScene.render(this.$refs.container)
-    this.energySymbolScene.showSymbol(...SYMBOLS[0])
+    this.energySymbolScene.showSymbol(SYMBOLS[0], ...OPTIONS)
 
     setInterval(() => {
-      this.energySymbolScene.transformSymbol(SYMBOLS[Math.floor(rand(0, 3))][0])
+      this.energySymbolScene.transformSymbol(SYMBOLS[Math.floor(rand(0, 3))])
     }, 2000)
 
     const eventTarget = this.energySymbolScene.getEventsTarget()
@@ -132,8 +83,7 @@ export default {
   .container {
     overflow: hidden;
     height: 100%;
-    background: url("../assets/tree-bg.png");
-    background-position: 68% 90%;
-    background-repeat: no-repeat;
+    /*background: url("../assets/tree-bg.png") no-repeat fixed center center;*/
+    /*background-size: contain;*/
   }
 </style>
