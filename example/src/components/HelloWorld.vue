@@ -11,7 +11,7 @@ export default {
     /**
      * @type {EnergySymbolScene}
      */
-    this.energySymbolScene = (new EnergySymbolScene(1920, 1080, 50, false))
+    this.energySymbolScene = (new EnergySymbolScene(1920, 1080, 50, true))
     // this.energySymbolScene.addSymbol('circle',
     //   VECTORS_CIRCLE,
     //   { min: 0.4, max: 0.6 },

@@ -11,10 +11,10 @@ export default class EnergySymbolScene {
   constructor (sceneWidth, sceneHeight, mouseDiameter, debugMode = true) {
     this.debugMode = debugMode
     this.eventTarget = new EventTarget()
-    this.mouse = { x: 0, y: 0 }
     this.figures = {}
     this.sceneWidth = sceneWidth
     this.sceneHeight = sceneHeight
+    this.mouse = null
     this.mouseDiameter = mouseDiameter
     this.showedSymbol = null
     this.touched = {}
@@ -210,21 +210,25 @@ export default class EnergySymbolScene {
    * @private
    */
   buildOutlines (bunches, colorsInfo, varianceRange, scaleRange, thicknessRange, rotationRange, count) {
-    const points = bunches.map(p => p.origin.position)
-
     const res = []
+    //const points = bunches.map(p => p.origin.position)
 
     for (let i = 0; i < count; i++) {
       // const fixedPoints = points.map(v => {
       //   // todo: поискать готовое свойство path
-      //   const cl = v.clone()
+      //   const cl = v //v.clone()
       //   cl.add(rand(varianceRange.min, varianceRange.max), rand(varianceRange.min, varianceRange.max))
       //   return cl
       // })
-      //
+
       // fixedPoints.map((vv, kk) => {
       //   this.physics.makeSpring(vv, bunches[kk].origin, 0.5, 0, 0)
       // })
+
+      // выбираем случайно из origin и variance
+      const randPoints = bunches.map(b => {
+        return (rand(-1, 1) > 0) ? b.origin.position : b.variance.position
+      })
 
       let randColor = colorsInfo[Math.floor(rand(0, colorsInfo.length))]
 
@@ -237,7 +241,7 @@ export default class EnergySymbolScene {
       const thickness = rand(thicknessRange.min, thicknessRange.max)
       const rotationShift = rand(rotationRange.min, rotationRange.max)
 
-      const outline = this.buildOutline(points, randColor, thickness, randScale, rotationShift)
+      const outline = this.buildOutline(randPoints, randColor, thickness, randScale, rotationShift)
       res.push(outline)
     }
 
@@ -248,15 +252,22 @@ export default class EnergySymbolScene {
    * @private
    */
   buildOutline (coords, color, lineWidth, scale, rotation, closed = true, curved = true) {
-    const line = new Two.Path(coords, closed, curved)
+    const line = new Two.Path(coords, closed, curved, false)
 
     line.stroke = color
     line.linewidth = lineWidth
     line.scale = scale // лучше не стоит
     line.rotation = rotation
+    // line.translation = [new Two.Vector(rotation, rotation), new Two.Vector(rotation, rotation)]
     line.fill = 'transparent'
     line.curved = true
-    line.miter = 0
+    // line.miter = 0.5
+
+    // coords.forEach(function(v) {
+    //   // var v = new Two.Vector(x, y);
+    //   v.position = new Two.Vector().copy(v);
+    //   line.vertices.push(v);
+    // });
 
     return line
   }
