@@ -6,20 +6,21 @@ export default class EnergySymbolScene {
   /**
    * @param {number} sceneWidth
    * @param {number} sceneHeight
+   * @param {number} mouseDiameter
    * @param {boolean} debugMode
    */
   constructor (sceneWidth, sceneHeight, mouseDiameter, debugMode = true) {
     this.debugMode = debugMode
     this.eventTarget = new EventTarget()
-    this.figures = {}
     this.sceneWidth = sceneWidth
     this.sceneHeight = sceneHeight
     this.mouse = null
     this.mouseDiameter = mouseDiameter
-    this.showedSymbol = null
     this.touched = {}
-
     this.physics = new Physics()
+    this.symbol = null
+    this.transformingSymbol = null
+    this.transformingStep = 0
 
     // const canvas = document.createElement('canvas');
     // canvas.width = sceneHeight
@@ -61,6 +62,7 @@ export default class EnergySymbolScene {
     this.background.add(this.mouse.shape)
 
     this.physics.onUpdate(this.onPhysicsUpdate.bind(this))
+    this.physics.play()
 
     this.repairTouchedTimer = setInterval(this.repairTouched.bind(this), 100)
 
@@ -68,7 +70,6 @@ export default class EnergySymbolScene {
   }
 
   /**
-   * @param {string} symbolKey
    * @param {Coords[]} symbolVectors
    * @param {Range} massRange
    * @param {Range} varianceRange
@@ -88,8 +89,7 @@ export default class EnergySymbolScene {
    * @param outlineVarianceRange
    * @param blurredOutlineVarianceRange
    */
-  addSymbol (
-    symbolKey,
+  showSymbol (
     symbolVectors,
     massRange,
     varianceRange,
@@ -104,44 +104,25 @@ export default class EnergySymbolScene {
       ...this.buildOutlines(bunches, blurredOutlineColors, blurredOutlineVarianceRange, blurredOutlineScaleRange, blurredOutlineThicknessRange, blurredOutlineRotationRange, blurredOutlineCount)
     ]
 
-    this.figures[symbolKey] = {
+    this.symbol = {
       bunches,
       outlines
     }
+
+    this.renderSymbol()
   }
 
   /**
-   * @param {string} symbolKey
+   * @param {Coords[]} symbolVectors
+   * @param {number} step
    */
-  showSymbol (symbolKey) {
-    /**
-     * @var {Figure}
-     */
-    const figure = this.figures[symbolKey]
-    if (figure === undefined) {
-      throw Error(`Undefined symbol key '${symbolKey}'`)
+  transformSymbol (symbolVectors) {
+    if (symbolVectors.length !== this.symbol.bunches.length) {
+      throw Error('Both symbol must have the same number of points')
     }
 
-    figure.bunches.map(bunch => {
-      this.foreground.add(bunch.origin.shape)
-      this.foreground.add(bunch.variance.shape)
-    })
-
-    figure.outlines.map(outline => {
-      this.foreground.add(outline)
-    })
-
-    this.physics.play()
-
-    this.showedSymbol = figure
-  }
-
-  /**
-   * @param {string} symbolKey
-   * @param {number} state
-   */
-  transformSymbol (symbolKey, state) {
-
+    this.transformingSymbol = symbolVectors
+    this.transformingStep = 0
   }
 
   /**
@@ -168,6 +149,38 @@ export default class EnergySymbolScene {
     clearInterval(this.repairTouchedTimer)
     this.container.removeEventListener('mousemove', this.onDocumentMouseMove.bind(this), false)
     // TODO: destroy
+  }
+
+  /**
+   * @private
+   */
+  renderSymbol () {
+    this.symbol.bunches.map(bunch => {
+      this.foreground.add(bunch.origin.shape)
+      this.foreground.add(bunch.variance.shape)
+    })
+
+    this.symbol.outlines.map(outline => {
+      this.foreground.add(outline)
+    })
+  }
+
+  applyTransforming (transformingSymbol, step) {
+    let s, d
+
+    for (let i = 0; i < this.symbol.bunches.length; i++) {
+      s = this.symbol.bunches[i].origin.position
+      d = transformingSymbol[i]
+
+      if (!s.equals(d)) {
+        s.lerp(d, step)
+      }
+
+      s = this.symbol.bunches[i].variance.position
+      // TODO: add variance
+      d = transformingSymbol[i]
+      s.lerp(d, step)
+    }
   }
 
   /**
@@ -299,9 +312,15 @@ export default class EnergySymbolScene {
   }
 
   repairTouched () {
+    // при трансформации не нуно возвращать
+    if (this.transformingSymbol) {
+      this.touched = {}
+      return
+    }
+
     for (let i of Object.keys(this.touched)) {
-      const origin = this.showedSymbol.bunches[i].origin
-      const variance = this.showedSymbol.bunches[i].variance
+      const origin = this.symbol.bunches[i].origin
+      const variance = this.symbol.bunches[i].variance
 
       const b = origin
       const c = variance
@@ -332,6 +351,16 @@ export default class EnergySymbolScene {
    */
   onTwosUpdate (frameCount, timeDelta) {
     this.physics.update()
+
+    if (this.transformingSymbol) {
+      if (this.transformingStep >= 1) {
+        this.transformingSymbol = null
+        return
+      }
+      this.transformingStep += 0.1
+      this.applyTransforming(this.transformingSymbol, this.transformingStep)
+    }
+
     // this.foreground.rotation += 0.001 * frameCount
   }
 
@@ -339,13 +368,13 @@ export default class EnergySymbolScene {
    * @private
    */
   onPhysicsUpdate () {
-    if (!this.showedSymbol) {
+    if (!this.symbol) {
       return
     }
 
-    for (let i = 0; i < this.showedSymbol.bunches.length; i++) {
-      const origin = this.showedSymbol.bunches[i].origin
-      const variance = this.showedSymbol.bunches[i].variance
+    for (let i = 0; i < this.symbol.bunches.length; i++) {
+      const origin = this.symbol.bunches[i].origin
+      const variance = this.symbol.bunches[i].variance
 
       const a = this.mouse
       const b = origin
