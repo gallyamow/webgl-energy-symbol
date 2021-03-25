@@ -4,7 +4,7 @@
 
 <script>
 import { EnergySymbolScene, rand, moveVectors, scaleVectors } from 'webgl-energy-symbol'
-import { VECTORS_TREE, VECTORS_FAN, VECTORS_RING, VECTORS_MICRO, GRADIENTS, GRADIENTS_BLURRED } from './examples'
+import { VECTORS_TREE, VECTORS_FAN, VECTORS_RING, VECTORS_MICRO, GRADIENTS, GRADIENTS_BLURRED } from './symbols'
 
 const TRANSFORMING_ENABLED = true
 
@@ -13,35 +13,48 @@ export default {
     /**
      * @type {EnergySymbolScene}
      */
-    this.energySymbolScene = (new EnergySymbolScene(window.innerWidth, window.innerHeight, 2, false))
+    this.energySymbolScene = (new EnergySymbolScene(window.innerWidth, window.innerHeight, 3, false))
   },
 
   mounted () {
-    const OPTIONS = [
-      { min: 5, max: 8 },
-      { min: -15, max: 15 },
-      {
-        springStrength: 0.6,
-        sprintDrag: 0,
-        sprintRest: 2
-      },
-      {
-        outlineColors: GRADIENTS,
-        outlineScaleRange: { min: 0.995, max: 1.005 },
-        outlineThicknessRange: { min: 1, max: 1.8 },
-        outlineVarianceRange: { min: -5, max: 5 },
-        outlineRotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
-        outlineCount: 7
-      },
-      {
-        blurredOutlineColors: GRADIENTS_BLURRED,
-        blurredOutlineScaleRange: { min: 0.995, max: 1.005 },
-        blurredOutlineThicknessRange: { min: 9.24, max: 10.36 },
-        blurredOutlineVarianceRange: { min: -10, max: 10 },
-        blurredOutlineRotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
-        blurredOutlineCount: 4
-      }
-    ]
+    /**
+     * @type {FigureOptions}
+     */
+    const OPTIONS_FIGURE = {
+      massRange: { min: 5.5, max: 8 },
+      varianceRange: { min: -2, max: 2 },
+    }
+
+    /**
+     * @type {OutlineOptions}
+     */
+    const OPTIONS_OUTLINE = {
+      colors: GRADIENTS,
+      varianceRange: { min: -5, max: 5 },
+      scaleRange: { min: 0.995, max: 1.005 },
+      thicknessRange: { min: 1, max: 1.8 },
+      rotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
+    }
+
+    /**
+     * @type {OutlineOptions}
+     */
+    const OPTIONS_BLURRED_OUTLINE = {
+      colors: GRADIENTS_BLURRED,
+      varianceRange: { min: -10, max: 10 },
+      scaleRange: { min: 0.995, max: 1.005 },
+      thicknessRange: { min: 9.24, max: 10.36 },
+      rotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
+    }
+
+    /**
+     * @type {SpringOptions}
+     */
+    const OPTIONS_SPRING = {
+      strengthRange: { min: 0.5, max: 0.7 },
+      dragRange: { min: 0, max: 0 },
+      restRange: { min: 2, max: 4 },
+    }
 
     // moving and scaling depends on current size (30 - columns count)
     const multiplier = 1 //window.innerWidth / 30
@@ -54,11 +67,21 @@ export default {
 
     // noinspection JSCheckFunctionSignatures
     this.energySymbolScene.render(this.$refs.container)
-    this.energySymbolScene.showSymbol(SYMBOLS[0], ...OPTIONS)
+
+    this.energySymbolScene.showSymbol(
+      SYMBOLS[0],
+      OPTIONS_FIGURE,
+      OPTIONS_SPRING,
+      10,
+      OPTIONS_OUTLINE,
+      4,
+      OPTIONS_BLURRED_OUTLINE
+    )
 
     if (TRANSFORMING_ENABLED) {
       setInterval(() => {
-        this.energySymbolScene.transformSymbol(SYMBOLS[Math.floor(rand(0, SYMBOLS.length))])
+        const randSymbol = SYMBOLS[Math.floor(rand(0, SYMBOLS.length))]
+        this.energySymbolScene.transformSymbol(randSymbol, OPTIONS_FIGURE.varianceRange)
       }, 2000)
     }
 

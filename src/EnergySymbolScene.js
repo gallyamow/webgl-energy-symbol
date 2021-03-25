@@ -11,6 +11,7 @@ export default class EnergySymbolScene {
    */
   constructor (sceneWidth, sceneHeight, mouseDiameter, debugMode = true) {
     this.debugMode = debugMode
+    this.rendered = false
     this.eventTarget = new EventTarget()
     this.sceneWidth = sceneWidth
     this.sceneHeight = sceneHeight
@@ -20,8 +21,8 @@ export default class EnergySymbolScene {
     this.physics = new Physics()
     this.symbol = null
     this.transformingSymbol = null
+    this.transformingSymbolVariance = null
     this.transformingStep = 0
-    this.rendered = false
 
     this.canvas = document.createElement('canvas')
     this.canvas.width = sceneWidth
@@ -75,38 +76,51 @@ export default class EnergySymbolScene {
   }
 
   /**
-   * @param {Coords[]} symbolVectors
-   * @param {Range} massRange
-   * @param {Range} varianceRange
-   * @param springStrength
-   * @param sprintDrag
-   * @param sprintRest
-   * @param outlineColors
-   * @param outlineScaleRange
-   * @param outlineThicknessRange
-   * @param outlineRotationRange
-   * @param outlineCount
-   * @param blurredOutlineColors
-   * @param blurredOutlineScaleRange
-   * @param blurredOutlineThicknessRange
-   * @param blurredOutlineRotationRange
-   * @param blurredOutlineCount
-   * @param outlineVarianceRange
-   * @param blurredOutlineVarianceRange
+   * @param {Coords[]} figureVectors
+   * @param {FigureOptions} figureOptions
+   * @param {SpringOptions} springOptions
+   * @param {number} outlineCount
+   * @param {OutlineOptions} outlineOptions
+   * @param {number} blurredOutlineCount
+   * @param {OutlineOptions} blurredOutlineOptions
    */
   showSymbol (
-    symbolVectors,
-    massRange,
-    varianceRange,
-    { springStrength, sprintDrag, sprintRest },
-    { outlineColors, outlineVarianceRange, outlineScaleRange, outlineThicknessRange, outlineRotationRange, outlineCount },
-    { blurredOutlineColors, blurredOutlineVarianceRange, blurredOutlineScaleRange, blurredOutlineThicknessRange, blurredOutlineRotationRange, blurredOutlineCount },
+    figureVectors,
+    figureOptions,
+    springOptions,
+    outlineCount,
+    outlineOptions,
+    blurredOutlineCount,
+    blurredOutlineOptions
   ) {
-    const bunches = this.buildFigureBunches(symbolVectors, massRange, varianceRange, springStrength, sprintDrag, sprintRest)
+    const bunches = this.buildFigureBunches(
+      figureVectors,
+      figureOptions.massRange,
+      figureOptions.varianceRange,
+      springOptions.strengthRange,
+      springOptions.dragRange,
+      springOptions.restRange
+    )
 
     const outlines = [
-      ...this.buildOutlines(bunches, outlineColors, outlineVarianceRange, outlineScaleRange, outlineThicknessRange, outlineRotationRange, outlineCount),
-      ...this.buildOutlines(bunches, blurredOutlineColors, blurredOutlineVarianceRange, blurredOutlineScaleRange, blurredOutlineThicknessRange, blurredOutlineRotationRange, blurredOutlineCount)
+      ...this.buildOutlines(
+        outlineCount,
+        bunches,
+        outlineOptions.colors,
+        outlineOptions.varianceRange,
+        outlineOptions.scaleRange,
+        outlineOptions.thicknessRange,
+        outlineOptions.rotationRange
+      ),
+      ...this.buildOutlines(
+        blurredOutlineCount,
+        bunches,
+        blurredOutlineOptions.colors,
+        blurredOutlineOptions.varianceRange,
+        blurredOutlineOptions.scaleRange,
+        blurredOutlineOptions.thicknessRange,
+        blurredOutlineOptions.rotationRange
+      ),
     ]
 
     this.symbol = {
@@ -119,13 +133,15 @@ export default class EnergySymbolScene {
 
   /**
    * @param {Coords[]} symbolVectors
+   * @param {Range} varianceRange
    */
-  transformSymbol (symbolVectors) {
+  transformSymbol (symbolVectors, varianceRange) {
     if (symbolVectors.length !== this.symbol.bunches.length) {
-      throw Error('Both symbol must have the same number of points')
+      throw Error('Both symbols must have the same number of points')
     }
 
     this.transformingSymbol = symbolVectors
+    this.transformingSymbolVariance = buildVectorsVariance(symbolVectors, varianceRange)
     this.transformingStep = 0
   }
 
@@ -179,7 +195,7 @@ export default class EnergySymbolScene {
     })
   }
 
-  applyTransforming (transformingSymbol, step) {
+  applyTransforming (transformingSymbol, transformingSymbolVariance, step) {
     let s, d
 
     for (let i = 0; i < this.symbol.bunches.length; i++) {
@@ -191,8 +207,7 @@ export default class EnergySymbolScene {
       }
 
       s = this.symbol.bunches[i].variance.position
-      // TODO: add variance
-      d = transformingSymbol[i]
+      d = transformingSymbolVariance[i]
       s.lerp(d, step)
     }
   }
@@ -201,14 +216,14 @@ export default class EnergySymbolScene {
    * @param {Coords[]} symbolVectors
    * @param {Range} massRange
    * @param {Range} varianceRange
-   * @param {number} springStrength
-   * @param {number} sprintDrag
-   * @param {number} sprintRest
+   * @param {Range} springStrengthRange
+   * @param {Range} sprintDragRange
+   * @param {Range} sprintRestRange
    * @return {ParticleBunch[]}
    *
    * @private
    */
-  buildFigureBunches (symbolVectors, massRange, varianceRange, springStrength, sprintDrag, sprintRest) {
+  buildFigureBunches (symbolVectors, massRange, varianceRange, springStrengthRange, sprintDragRange, sprintRestRange) {
     const res = []
 
     const varianceVectors = buildVectorsVariance(symbolVectors, varianceRange)
@@ -224,6 +239,9 @@ export default class EnergySymbolScene {
       coords = varianceVectors[i]
       const variance = this.buildParticle(mass, coords.x, coords.y, 'green')
 
+      const springStrength = rand(springStrengthRange.min, springStrengthRange.max)
+      const sprintDrag = rand(sprintDragRange.min, sprintDragRange.max)
+      const sprintRest = rand(sprintRestRange.min, sprintRestRange.max)
       const spring = this.physics.makeSpring(variance, origin, springStrength, sprintDrag, sprintRest)
       // const spring = null
 
@@ -236,7 +254,7 @@ export default class EnergySymbolScene {
   /**
    * @private
    */
-  buildOutlines (bunches, colorsInfo, varianceRange, scaleRange, thicknessRange, rotationRange, count) {
+  buildOutlines (count, bunches, colorsInfo, varianceRange, scaleRange, thicknessRange, rotationRange) {
     const res = []
 
     // TODO: rm varianceRange
@@ -258,7 +276,7 @@ export default class EnergySymbolScene {
       const thickness = rand(thicknessRange.min, thicknessRange.max)
       const rotationShift = rand(rotationRange.min, rotationRange.max)
 
-      const outline = this.buildOutline(randPoints, randColor, thickness,  randScale, rotationShift)
+      const outline = this.buildOutline(randPoints, randColor, thickness, randScale, rotationShift)
       res.push(outline)
     }
 
@@ -354,10 +372,12 @@ export default class EnergySymbolScene {
     if (this.transformingSymbol) {
       if (this.transformingStep >= 1) {
         this.transformingSymbol = null
+        this.transformingSymbolVariance = null
+        this.transformingStep = 0
         return
       }
       this.transformingStep += 0.1
-      this.applyTransforming(this.transformingSymbol, this.transformingStep)
+      this.applyTransforming(this.transformingSymbol, this.transformingSymbolVariance, this.transformingStep)
     }
 
     // this.foreground.rotation += 0.001 * frameCount
@@ -430,4 +450,29 @@ export default class EnergySymbolScene {
  * @type {Object}
  * @property {ParticleBunch} bunches
  * @property {*} outlines
+ */
+
+/**
+ * @typedef FigureOptions
+ * @type {Object}
+ * @property {Range} massRange
+ * @property {Range} varianceRange
+ */
+
+/**
+ * @typedef SpringOptions
+ * @type {Object}
+ * @property {Range} strengthRange
+ * @property {Range} dragRange
+ * @property {Range} restRange
+ */
+
+/**
+ * @typedef OutlineOptions
+ * @type {Object}
+ * @property {Range} colors
+ * @property {Range} varianceRange
+ * @property {Range} scaleRange
+ * @property {Range} thicknessRange
+ * @property {Range} rotationRange
  */
