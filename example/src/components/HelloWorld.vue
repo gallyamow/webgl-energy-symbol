@@ -97,6 +97,7 @@ export default {
     this.energySymbolScene.destroy()
 
     window.removeEventListener('resize', this.onWindowResize)
+    window.removeEventListener('wheel', this.onWheel)
   },
 
   methods: {
