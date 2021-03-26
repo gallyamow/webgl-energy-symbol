@@ -39,23 +39,23 @@ export const SYMBOL_INFO_FAN = [
 ]
 
 export const SYMBOL_INFO_TREE = [
-  { x: 52, y: 354, sx: 152, sy: 361 },
-  { x: 171, y: 235, sx: 204, sy: 298 },
-  { x: 262, y: 235, sx: 294, sy: 270 },
-  { x: 296, y: 148, sx: 328, sy: 184 },
-  { x: 407, y: 82, sx: 389, sy: 193 },
-  { x: 481, y: 174, sx: 460, sy: 229 },
-  { x: 652, y: 148, sx: 613, sy: 249 },
-  { x: 771, y: 257, sx: 660, sy: 295 },
-  { x: 715, y: 414, sx: 677, sy: 423 },
-  { x: 798, y: 527, sx: 739, sy: 545 },
-  { x: 822, y: 654, sx: 719, sy: 615 },
-  { x: 652, y: 789, sx: 631, sy: 684 },
+  { x: 52, y: 354, sx: 82, sy: 374 },
+  { x: 171, y: 235, sx: 191, sy: 255 },
+  { x: 262, y: 235, sx: 284, sy: 270 },
+  { x: 296, y: 148, sx: 318, sy: 168 },
+  { x: 407, y: 82, sx: 389, sy: 102 },
+  { x: 481, y: 174, sx: 460, sy: 194 },
+  { x: 652, y: 148, sx: 633, sy: 168 },
+  { x: 771, y: 257, sx: 750, sy: 275 },
+  { x: 715, y: 414, sx: 695, sy: 423 },
+  { x: 798, y: 527, sx: 778, sy: 545 },
+  { x: 822, y: 654, sx: 800, sy: 615 },
+  { x: 652, y: 789, sx: 631, sy: 769 },
   { x: 499, y: 726, sx: 494, sy: 700 },
-  { x: 312, y: 789, sx: 344, sy: 703 },
+  { x: 312, y: 789, sx: 332, sy: 763 },
   { x: 209, y: 702, sx: 223, sy: 681 },
-  { x: 20, y: 709, sx: 102, sy: 663 },
-  { x: 171, y: 502, sx: 211, sy: 488 },
+  { x: 20, y: 709, sx: 40, sy: 663 },
+  { x: 171, y: 502, sx: 191, sy: 488 },
 ]
 
 export const SYMBOL_INFO_MICRO = [
@@ -88,13 +88,13 @@ export const COLORS = [
 ]
 
 export const GRADIENTS = [
-  { color1: COLORS[0], color2: COLORS[1], width: 0.8 },
-  { color1: COLORS[2], color2: COLORS[3], width: 0.8 },
-  { color1: COLORS[3], color2: COLORS[4], width: 0.8 },
-  { color1: COLORS[5], color2: COLORS[6], width: 0.8 }
+  { color1: COLORS[0], color2: COLORS[1], width: 0.5 },
+  { color1: COLORS[2], color2: COLORS[3], width: 0.1 },
+  { color1: COLORS[3], color2: COLORS[4], width: 0.1 },
+  { color1: COLORS[5], color2: COLORS[6], width: 0.1 }
 ]
 
 export const GRADIENTS_BLURRED = [
-  { color1: '#00E39133', color2: '#00E39122', width: 0.6 },
-  { color1: '#00E39133', color2: '#28FFD822', width: 0.6 },
+  { color1: '#00E39133', color2: '#00E39144', width: 0.6 },
+  { color1: '#00E39133', color2: '#28FFD844', width: 0.6 },
 ]

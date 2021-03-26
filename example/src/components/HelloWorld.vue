@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import { EnergySymbolScene, rand, moveVectors, scaleVectors, readSymbolPoints } from 'webgl-energy-symbol'
+import { EnergySymbolScene, rand, readSymbolPoints } from 'webgl-energy-symbol'
 import {
   SYMBOL_INFO_TREE,
   SYMBOL_INFO_RING,
@@ -14,13 +14,13 @@ import {
   GRADIENTS_BLURRED
 } from './symbols'
 
-const TRANSFORMING_ENABLED = true
+const TRANSFORMING_ENABLED = false
 
 /**
  * @type {FigureOptions}
  */
 const OPTIONS_FIGURE = {
-  massRange: { min: 5.5, max: 8 },
+  massRange: { min: 2, max: 15 },
   varianceRange: { min: -10, max: 10 },
 }
 
@@ -29,10 +29,10 @@ const OPTIONS_FIGURE = {
  */
 const OPTIONS_OUTLINE = {
   colors: GRADIENTS,
-  varianceRange: { min: -5, max: 5 },
-  scaleRange: { min: 0.995, max: 1.005 },
+  varianceRange: { min: -10, max: 10 }, // TODO: не работает
+  scaleRange: { min: 0.98, max: 1.01 },
   thicknessRange: { min: 1, max: 1.8 },
-  rotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
+  rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
 }
 
 /**
@@ -41,34 +41,32 @@ const OPTIONS_OUTLINE = {
 const OPTIONS_BLURRED_OUTLINE = {
   colors: GRADIENTS_BLURRED,
   varianceRange: { min: -10, max: 10 },
-  scaleRange: { min: 0.995, max: 1.005 },
-  thicknessRange: { min: 9.24, max: 10.36 },
-  rotationRange: { min: -Math.PI / 100, max: Math.PI / 100 },
+  scaleRange: { min: 0.98, max: 1.01 },
+  thicknessRange: { min: 9.24, max: 15.36 },
+  rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
 }
 
 /**
  * @type {SpringOptions}
  */
 const OPTIONS_SPRING = {
-  strengthRange: { min: 0.5, max: 0.7 },
+  strengthRange: { min: 0.01, max: 0.02 },
   dragRange: { min: 0, max: 0 },
-  restRange: { min: 2, max: 4 },
+  restRange: { min: 0, max: 1 },
 }
 
 // moving and scaling depends on current size (30 - columns count)
-const multiplier = 1 //window.innerWidth / 30
 const SYMBOLS_ORIGIN_POINTS = [
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['originPoints'], multiplier), -500, -400),
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['originPoints'], multiplier), -500, -400),
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['originPoints'], multiplier), -500, -400),
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints'], multiplier), -500, -400),
+  readSymbolPoints(SYMBOL_INFO_TREE)['originPoints'],
+  readSymbolPoints(SYMBOL_INFO_RING)['originPoints'],
+  readSymbolPoints(SYMBOL_INFO_FAN)['originPoints'],
+  readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints']
 ]
-
 const SYMBOLS_VARIANCE_POINTS = [
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['variancePoints'], multiplier), -500, -400),
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['variancePoints'], multiplier), -500, -400),
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['variancePoints'], multiplier), -500, -400),
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints'], multiplier), -500, -400),
+  readSymbolPoints(SYMBOL_INFO_TREE)['variancePoints'],
+  readSymbolPoints(SYMBOL_INFO_RING)['variancePoints'],
+  readSymbolPoints(SYMBOL_INFO_FAN)['variancePoints'],
+  readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints']
 ]
 
 export default {
@@ -91,7 +89,7 @@ export default {
       variancePoints,
       OPTIONS_FIGURE,
       OPTIONS_SPRING,
-      9,
+      6,
       OPTIONS_OUTLINE,
       4,
       OPTIONS_BLURRED_OUTLINE

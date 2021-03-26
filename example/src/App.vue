@@ -22,7 +22,7 @@ export default {
   }
 
   body {
-    background: radial-gradient(at center, #04221D, #041411);
+    background: radial-gradient(at center, #04221D, #000);
     overflow: hidden;
   }
 </style>

@@ -167,8 +167,8 @@ export default class EnergySymbolScene {
     this.canvas.width = this.sceneWidth
     this.canvas.height = this.sceneHeight
 
-    this.foreground.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
-    this.background.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
+    // this.foreground.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
+    // this.background.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
 
     if (this.rendered) {
       this.two.update()
@@ -267,7 +267,8 @@ export default class EnergySymbolScene {
       // выбираем случайно из origin и variance
       const randPoints = bunches.map(b => {
         // return b.origin.position
-        return (rand(-1, 1) > 0) ? b.origin.position : b.variance.position
+        return b.origin.position
+        // return (rand(-1, 1) > 0) ? b.origin.position : b.variance.position
       })
 
       let randColor = colorsInfo[Math.floor(rand(0, colorsInfo.length))]
@@ -326,7 +327,7 @@ export default class EnergySymbolScene {
    */
   buildParticle (mass, x, y, color) {
     const p = this.physics.makeParticle(mass, x, y)
-    p.shape = this.two.makeCircle(p.position.x, p.position.y, 10)
+    p.shape = this.two.makeCircle(p.position.x, p.position.y, mass)
     p.position = p.shape.position
     p.shape.noStroke().fill = this.debugMode ? color : 'transparent'
 
@@ -364,8 +365,8 @@ export default class EnergySymbolScene {
   onDocumentMouseMove (event) {
     event.preventDefault()
 
-    this.mouse.position.x = event.clientX - this.background.translation.x
-    this.mouse.position.y = event.clientY - this.background.translation.y
+    this.mouse.position.x = event.clientX // - this.background.translation.x
+    this.mouse.position.y = event.clientY // - this.background.translation.y
   }
 
   /**
