@@ -82,20 +82,14 @@ export default class EnergySymbolScene {
    * @param {Coords[]} variancePoints
    * @param {FigureOptions} figureOptions
    * @param {SpringOptions} springOptions
-   * @param {number} outlineCount
-   * @param {OutlineOptions} outlineOptions
-   * @param {number} blurredOutlineCount
-   * @param {OutlineOptions} blurredOutlineOptions
+   * @param {OutlineOptions[]} outlineOptions
    */
   showSymbol (
     originPoints,
     variancePoints,
     figureOptions,
     springOptions,
-    outlineCount,
-    outlineOptions,
-    blurredOutlineCount,
-    blurredOutlineOptions
+    outlineOptions
   ) {
     const bunches = this.buildFigureBunches(
       originPoints,
@@ -108,24 +102,7 @@ export default class EnergySymbolScene {
     )
 
     const outlines = [
-      ...this.buildOutlines(
-        outlineCount,
-        bunches,
-        outlineOptions.colors,
-        outlineOptions.translationRange,
-        outlineOptions.scaleRange,
-        outlineOptions.thicknessRange,
-        outlineOptions.rotationRange
-      ),
-      ...this.buildOutlines(
-        blurredOutlineCount,
-        bunches,
-        blurredOutlineOptions.colors,
-        blurredOutlineOptions.translationRange,
-        blurredOutlineOptions.scaleRange,
-        blurredOutlineOptions.thicknessRange,
-        blurredOutlineOptions.rotationRange
-      ),
+      ...this.buildOutlines(bunches, outlineOptions)
     ]
 
     this.symbol = {
@@ -247,7 +224,11 @@ export default class EnergySymbolScene {
       const springStrength = rand(springStrengthRange.min, springStrengthRange.max)
       const sprintDrag = rand(sprintDragRange.min, sprintDragRange.max)
       const sprintRest = rand(sprintRestRange.min, sprintRestRange.max)
-      const spring = this.noSpring ? null : this.physics.makeSpring(variance, origin, springStrength, sprintDrag, sprintRest)
+
+      let spring = null
+      if (!this.noSpring) {
+        spring = this.physics.makeSpring(variance, origin, springStrength, sprintDrag, sprintRest)
+      }
 
       res.push({ origin, variance, spring })
     }
@@ -258,12 +239,10 @@ export default class EnergySymbolScene {
   /**
    * @private
    */
-  buildOutlines (count, bunches, colorsInfo, translationRange, scaleRange, thicknessRange, rotationRange) {
+  buildOutlines (bunches, outlineOptions) {
     const res = []
 
-    // TODO: rm varianceRange
-
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < outlineOptions.length; i++) {
       // выбираем случайно из origin и variance
       const randPoints = bunches.map(b => {
         // return b.origin.position
@@ -271,19 +250,17 @@ export default class EnergySymbolScene {
         // return (rand(-1, 1) > 0) ? b.origin.position : b.variance.position
       })
 
-      let randColor = colorsInfo[Math.floor(rand(0, colorsInfo.length))]
+      const options = outlineOptions[i]
 
-      if (!(randColor instanceof String)) {
-        // it's a gradient config
-        randColor = this.buildLineGradient(randColor.color1, randColor.color2, randColor.width)
-      }
+      const randScale = rand(options.scaleRange.min, options.scaleRange.max)
+      const thickness = rand(options.thicknessRange.min, options.thicknessRange.max)
+      const rotationShift = rand(options.rotationRange.min, options.rotationRange.max)
+      const translation = new Two.Vector(
+        rand(options.translationRange.min, options.translationRange.max),
+        rand(options.translationRange.min, options.translationRange.max)
+      )
 
-      const randScale = rand(scaleRange.min, scaleRange.max)
-      const thickness = rand(thicknessRange.min, thicknessRange.max)
-      const rotationShift = rand(rotationRange.min, rotationRange.max)
-      const translation = new Two.Vector(rand(translationRange.min, translationRange.max), rand(translationRange.min, translationRange.max))
-
-      const outline = this.buildOutline(randPoints, randColor, thickness, randScale, rotationShift, translation)
+      const outline = this.buildOutline(randPoints, options.color, thickness, randScale, rotationShift, translation)
       res.push(outline)
     }
 
@@ -293,7 +270,7 @@ export default class EnergySymbolScene {
   /**
    * @private
    */
-  buildOutline (coords, color, lineWidth, scale, rotation, translation,  closed = true, curved = true) {
+  buildOutline (coords, color, lineWidth, scale, rotation, translation, closed = true, curved = true) {
     const line = new Two.Path(coords, closed, curved, false)
 
     line.stroke = color
@@ -478,7 +455,7 @@ export default class EnergySymbolScene {
 /**
  * @typedef OutlineOptions
  * @type {Object}
- * @property {Range} colors
+ * @property {Range} color
  * @property {Range} translationRange
  * @property {Range} scaleRange
  * @property {Range} thicknessRange

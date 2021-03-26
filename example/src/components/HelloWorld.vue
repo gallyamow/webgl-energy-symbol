@@ -9,12 +9,10 @@ import {
   SYMBOL_INFO_TREE,
   SYMBOL_INFO_RING,
   SYMBOL_INFO_FAN,
-  SYMBOL_INFO_MICRO,
-  GRADIENTS,
-  GRADIENTS_BLURRED
+  SYMBOL_INFO_MICRO
 } from './symbols'
 
-const TRANSFORMING_ENABLED = true
+const TRANSFORMING_ENABLED = false
 
 /**
  * @type {FigureOptions}
@@ -24,34 +22,85 @@ const OPTIONS_FIGURE = {
   varianceRange: { min: -10, max: 10 },
 }
 
-/**
- * @type {OutlineOptions}
- */
-const OPTIONS_OUTLINE = {
-  colors: GRADIENTS,
-  translationRange: { min: -5, max: 5 }, // TODO: не работает
-  scaleRange: { min: 0.98, max: 1.01 },
-  thicknessRange: { min: 1, max: 1.8 },
-  rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
-}
-
-/**
- * @type {OutlineOptions}
- */
-const OPTIONS_BLURRED_OUTLINE = {
-  colors: GRADIENTS_BLURRED,
-  translationRange: { min: -5, max: 5 },
-  scaleRange: { min: 0.98, max: 1.01 },
-  thicknessRange: { min: 9.24, max: 15.36 },
-  rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
-}
+const OPTIONS_OUTLINE = [
+  {
+    color: '#09FFF0',
+    thicknessRange: 1,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#26FFD808',
+    thicknessRange: 30,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#0BF0FF',
+    thicknessRange: 2,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#28CBFF',
+    thicknessRange: 2,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#00F0FF',
+    thicknessRange: 2,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#26D8FF05',
+    thicknessRange: 25,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#26FFD80F',
+    thicknessRange: 15,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#0C8A73',
+    thicknessRange: 2,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#00C2FF05',
+    thicknessRange: 25,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  },
+  {
+    color: '#4FD5FF',
+    thicknessRange: 1,
+    translationRange: { min: -5, max: 5 },
+    scaleRange: { min: 0.98, max: 1.01 },
+    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+  }
+]
 
 /**
  * @type {SpringOptions}
  */
 const OPTIONS_SPRING = {
-  strengthRange: { min: 0.01, max: 0.02 },
-  dragRange: { min: 0, max: 0 },
+  strengthRange: { min: 0.1, max: 0.5 },
+  dragRange: { min: 0, max: 2 },
   restRange: { min: 0, max: 1 },
 }
 
@@ -89,10 +138,7 @@ export default {
       variancePoints,
       OPTIONS_FIGURE,
       OPTIONS_SPRING,
-      6,
       OPTIONS_OUTLINE,
-      4,
-      OPTIONS_BLURRED_OUTLINE
     )
 
     if (TRANSFORMING_ENABLED) {
