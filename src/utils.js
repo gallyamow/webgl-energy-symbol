@@ -2,6 +2,13 @@ export function rand (min, max) {
   return Math.random() * (max - min) + min
 }
 
+export function readSymbolPoints (symbolDescription) {
+  return {
+    originPoints: symbolDescription.map(v => ({ x: v.x, y: v.y })),
+    variancePoints: symbolDescription.map(v => ({ x: v.sx, y: v.sy })),
+  }
+}
+
 export function scaleVectors (vectors, multiplier) {
   return vectors.map(v => ({ x: v.x * multiplier, y: v.y * multiplier }))
 }

@@ -8,9 +8,11 @@ export default class EnergySymbolScene {
    * @param {number} sceneHeight
    * @param {number} mouseDiameter
    * @param {boolean} debugMode
+   * @param noSpring
    */
-  constructor (sceneWidth, sceneHeight, mouseDiameter, debugMode = true) {
+  constructor (sceneWidth, sceneHeight, mouseDiameter, debugMode = true, noSpring = false) {
     this.debugMode = debugMode
+    this.noSpring = noSpring
     this.rendered = false
     this.eventTarget = new EventTarget()
     this.sceneWidth = sceneWidth
@@ -76,7 +78,8 @@ export default class EnergySymbolScene {
   }
 
   /**
-   * @param {Coords[]} figureVectors
+   * @param {Coords[]} originPoints
+   * @param {Coords[]} variancePoints
    * @param {FigureOptions} figureOptions
    * @param {SpringOptions} springOptions
    * @param {number} outlineCount
@@ -85,7 +88,8 @@ export default class EnergySymbolScene {
    * @param {OutlineOptions} blurredOutlineOptions
    */
   showSymbol (
-    figureVectors,
+    originPoints,
+    variancePoints,
     figureOptions,
     springOptions,
     outlineCount,
@@ -94,7 +98,8 @@ export default class EnergySymbolScene {
     blurredOutlineOptions
   ) {
     const bunches = this.buildFigureBunches(
-      figureVectors,
+      originPoints,
+      variancePoints,
       figureOptions.massRange,
       figureOptions.varianceRange,
       springOptions.strengthRange,
@@ -132,16 +137,17 @@ export default class EnergySymbolScene {
   }
 
   /**
-   * @param {Coords[]} symbolVectors
+   * @param {Coords[]} originPoints
+   * @param {Coords[]} variancePoints
    * @param {Range} varianceRange
    */
-  transformSymbol (symbolVectors, varianceRange) {
-    if (symbolVectors.length !== this.symbol.bunches.length) {
+  transformSymbol (originPoints, variancePoints, varianceRange) {
+    if (originPoints.length !== this.symbol.bunches.length) {
       throw Error('Both symbols must have the same number of points')
     }
 
-    this.transformingSymbol = symbolVectors
-    this.transformingSymbolVariance = buildVectorsVariance(symbolVectors, varianceRange)
+    this.transformingSymbol = originPoints
+    this.transformingSymbolVariance = variancePoints
     this.transformingStep = 0
   }
 
@@ -213,7 +219,8 @@ export default class EnergySymbolScene {
   }
 
   /**
-   * @param {Coords[]} symbolVectors
+   * @param {Coords[]} originPoints
+   * @param {Coords[]} variancePoints
    * @param {Range} massRange
    * @param {Range} varianceRange
    * @param {Range} springStrengthRange
@@ -223,27 +230,26 @@ export default class EnergySymbolScene {
    *
    * @private
    */
-  buildFigureBunches (symbolVectors, massRange, varianceRange, springStrengthRange, sprintDragRange, sprintRestRange) {
+  buildFigureBunches (originPoints, variancePoints, massRange, varianceRange, springStrengthRange, sprintDragRange, sprintRestRange) {
     const res = []
 
-    const varianceVectors = buildVectorsVariance(symbolVectors, varianceRange)
+    // const varianceVectors = buildVectorsVariance(originPoints, varianceRange)
 
     let mass, coords
 
-    for (let i = 0; i < symbolVectors.length; i++) {
+    for (let i = 0; i < originPoints.length; i++) {
       mass = rand(massRange.min, massRange.max)
-      coords = symbolVectors[i]
+      coords = originPoints[i]
       const origin = this.buildParticle(mass, coords.x, coords.y, 'red')
 
       mass = rand(massRange.min, massRange.max)
-      coords = varianceVectors[i]
+      coords = variancePoints[i]
       const variance = this.buildParticle(mass, coords.x, coords.y, 'green')
 
       const springStrength = rand(springStrengthRange.min, springStrengthRange.max)
       const sprintDrag = rand(sprintDragRange.min, sprintDragRange.max)
       const sprintRest = rand(sprintRestRange.min, sprintRestRange.max)
-      const spring = this.physics.makeSpring(variance, origin, springStrength, sprintDrag, sprintRest)
-      // const spring = null
+      const spring = this.noSpring ? null : this.physics.makeSpring(variance, origin, springStrength, sprintDrag, sprintRest)
 
       res.push({ origin, variance, spring })
     }

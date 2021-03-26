@@ -1,4 +1,4 @@
-export const VECTORS_RING = [
+export const SYMBOL_INFO_RING = [
   { x: 182, y: 393, sx: 131, sy: 386 },
   { x: 212, y: 280, sx: 154, sy: 260 },
   { x: 265, y: 204, sx: 202, sy: 158 },
@@ -18,7 +18,7 @@ export const VECTORS_RING = [
   { x: 182, y: 523, sx: 225, sy: 522 },
 ]
 
-export const VECTORS_FAN = [
+export const SYMBOL_INFO_FAN = [
   { x: 84, y: 339, sx: 22, sy: 352 },
   { x: 158, y: 178, sx: 133, sy: 125 },
   { x: 313, y: 213, sx: 323, sy: 176 },
@@ -38,7 +38,7 @@ export const VECTORS_FAN = [
   { x: 219, y: 383, sx: 217, sy: 415 },
 ]
 
-export const VECTORS_TREE = [
+export const SYMBOL_INFO_TREE = [
   { x: 52, y: 354, sx: 152, sy: 361 },
   { x: 171, y: 235, sx: 204, sy: 298 },
   { x: 262, y: 235, sx: 294, sy: 270 },
@@ -58,7 +58,7 @@ export const VECTORS_TREE = [
   { x: 171, y: 502, sx: 211, sy: 488 },
 ]
 
-export const VECTORS_MICRO = [
+export const SYMBOL_INFO_MICRO = [
   { x: 160, y: 451, sx: 117, sy: 450 },
   { x: 287, y: 391, sx: 223, sy: 358 },
   { x: 298, y: 300, sx: 339, sy: 335 },

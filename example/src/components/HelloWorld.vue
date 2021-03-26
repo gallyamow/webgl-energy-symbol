@@ -4,10 +4,17 @@
 </template>
 
 <script>
-import { EnergySymbolScene, rand, moveVectors, scaleVectors } from 'webgl-energy-symbol'
-import { VECTORS_TREE, VECTORS_FAN, VECTORS_RING, VECTORS_MICRO, GRADIENTS, GRADIENTS_BLURRED } from './symbols'
+import { EnergySymbolScene, rand, moveVectors, scaleVectors, readSymbolPoints } from 'webgl-energy-symbol'
+import {
+  SYMBOL_INFO_TREE,
+  SYMBOL_INFO_RING,
+  SYMBOL_INFO_FAN,
+  SYMBOL_INFO_MICRO,
+  GRADIENTS,
+  GRADIENTS_BLURRED
+} from './symbols'
 
-const TRANSFORMING_ENABLED = false
+const TRANSFORMING_ENABLED = true
 
 /**
  * @type {FigureOptions}
@@ -50,11 +57,18 @@ const OPTIONS_SPRING = {
 
 // moving and scaling depends on current size (30 - columns count)
 const multiplier = 1 //window.innerWidth / 30
-const SYMBOLS = [
-  moveVectors(scaleVectors(VECTORS_TREE, multiplier), -500, -400),
-  moveVectors(scaleVectors(VECTORS_RING, multiplier), -500, -400),
-  moveVectors(scaleVectors(VECTORS_MICRO, multiplier), -500, -400),
-  moveVectors(scaleVectors(VECTORS_FAN, multiplier), -500, -400),
+const SYMBOLS_ORIGIN_POINTS = [
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['originPoints'], multiplier), -500, -400),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['originPoints'], multiplier), -500, -400),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['originPoints'], multiplier), -500, -400),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints'], multiplier), -500, -400),
+]
+
+const SYMBOLS_VARIANCE_POINTS = [
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['variancePoints'], multiplier), -500, -400),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['variancePoints'], multiplier), -500, -400),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['variancePoints'], multiplier), -500, -400),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints'], multiplier), -500, -400),
 ]
 
 export default {
@@ -62,15 +76,19 @@ export default {
     /**
      * @type {EnergySymbolScene}
      */
-    this.energySymbolScene = (new EnergySymbolScene(window.innerWidth, window.innerHeight, 3, false))
+    this.energySymbolScene = (new EnergySymbolScene(window.innerWidth, window.innerHeight, 3, false, false))
   },
 
   mounted () {
     // noinspection JSCheckFunctionSignatures
     this.energySymbolScene.render(this.$refs.container)
 
+    const originPoints = SYMBOLS_ORIGIN_POINTS[0]
+    const variancePoints = SYMBOLS_VARIANCE_POINTS[0]
+
     this.energySymbolScene.showSymbol(
-      SYMBOLS[0],
+      originPoints,
+      variancePoints,
       OPTIONS_FIGURE,
       OPTIONS_SPRING,
       9,
@@ -81,8 +99,7 @@ export default {
 
     if (TRANSFORMING_ENABLED) {
       setInterval(() => {
-        const randSymbol = SYMBOLS[Math.floor(rand(0, SYMBOLS.length))]
-        this.energySymbolScene.transformSymbol(randSymbol, OPTIONS_FIGURE.varianceRange)
+        this.transformToRand()
       }, 2000)
     }
 
@@ -101,6 +118,14 @@ export default {
   },
 
   methods: {
+    transformToRand () {
+      const randSymbolIndex = Math.floor(rand(0, SYMBOLS_ORIGIN_POINTS.length))
+      const originPoints = SYMBOLS_ORIGIN_POINTS[randSymbolIndex]
+      const variancePoints = SYMBOLS_VARIANCE_POINTS[randSymbolIndex]
+
+      this.energySymbolScene.transformSymbol(originPoints, variancePoints, OPTIONS_FIGURE.varianceRange)
+    },
+
     onReady () {
       console.log('Are you ready? I\'m ready!')
     },
@@ -110,8 +135,7 @@ export default {
     },
 
     onWheel () {
-      const randSymbol = SYMBOLS[Math.floor(rand(0, SYMBOLS.length))]
-      this.energySymbolScene.transformSymbol(randSymbol, OPTIONS_FIGURE.varianceRange)
+      this.transformToRand()
     }
   }
 }
