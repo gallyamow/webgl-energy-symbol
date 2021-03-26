@@ -14,7 +14,7 @@ import {
   GRADIENTS_BLURRED
 } from './symbols'
 
-const TRANSFORMING_ENABLED = false
+const TRANSFORMING_ENABLED = true
 
 /**
  * @type {FigureOptions}
@@ -29,7 +29,7 @@ const OPTIONS_FIGURE = {
  */
 const OPTIONS_OUTLINE = {
   colors: GRADIENTS,
-  varianceRange: { min: -10, max: 10 }, // TODO: не работает
+  translationRange: { min: -5, max: 5 }, // TODO: не работает
   scaleRange: { min: 0.98, max: 1.01 },
   thicknessRange: { min: 1, max: 1.8 },
   rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
@@ -40,7 +40,7 @@ const OPTIONS_OUTLINE = {
  */
 const OPTIONS_BLURRED_OUTLINE = {
   colors: GRADIENTS_BLURRED,
-  varianceRange: { min: -10, max: 10 },
+  translationRange: { min: -5, max: 5 },
   scaleRange: { min: 0.98, max: 1.01 },
   thicknessRange: { min: 9.24, max: 15.36 },
   rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },

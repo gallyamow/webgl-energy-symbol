@@ -112,7 +112,7 @@ export default class EnergySymbolScene {
         outlineCount,
         bunches,
         outlineOptions.colors,
-        outlineOptions.varianceRange,
+        outlineOptions.translationRange,
         outlineOptions.scaleRange,
         outlineOptions.thicknessRange,
         outlineOptions.rotationRange
@@ -121,7 +121,7 @@ export default class EnergySymbolScene {
         blurredOutlineCount,
         bunches,
         blurredOutlineOptions.colors,
-        blurredOutlineOptions.varianceRange,
+        blurredOutlineOptions.translationRange,
         blurredOutlineOptions.scaleRange,
         blurredOutlineOptions.thicknessRange,
         blurredOutlineOptions.rotationRange
@@ -258,7 +258,7 @@ export default class EnergySymbolScene {
   /**
    * @private
    */
-  buildOutlines (count, bunches, colorsInfo, varianceRange, scaleRange, thicknessRange, rotationRange) {
+  buildOutlines (count, bunches, colorsInfo, translationRange, scaleRange, thicknessRange, rotationRange) {
     const res = []
 
     // TODO: rm varianceRange
@@ -281,8 +281,9 @@ export default class EnergySymbolScene {
       const randScale = rand(scaleRange.min, scaleRange.max)
       const thickness = rand(thicknessRange.min, thicknessRange.max)
       const rotationShift = rand(rotationRange.min, rotationRange.max)
+      const translation = new Two.Vector(rand(translationRange.min, translationRange.max), rand(translationRange.min, translationRange.max))
 
-      const outline = this.buildOutline(randPoints, randColor, thickness, randScale, rotationShift)
+      const outline = this.buildOutline(randPoints, randColor, thickness, randScale, rotationShift, translation)
       res.push(outline)
     }
 
@@ -292,12 +293,13 @@ export default class EnergySymbolScene {
   /**
    * @private
    */
-  buildOutline (coords, color, lineWidth, scale, rotation, closed = true, curved = true) {
+  buildOutline (coords, color, lineWidth, scale, rotation, translation,  closed = true, curved = true) {
     const line = new Two.Path(coords, closed, curved, false)
 
     line.stroke = color
     line.linewidth = lineWidth
     line.scale = scale // лучше не стоит
+    line.translation = new Two.Vector(rand(-10, 10), rand(-10, 10))
     line.rotation = rotation
     line.fill = 'transparent'
     line.curved = true
@@ -477,7 +479,7 @@ export default class EnergySymbolScene {
  * @typedef OutlineOptions
  * @type {Object}
  * @property {Range} colors
- * @property {Range} varianceRange
+ * @property {Range} translationRange
  * @property {Range} scaleRange
  * @property {Range} thicknessRange
  * @property {Range} rotationRange
