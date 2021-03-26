@@ -1,6 +1,6 @@
 import Two from 'two.js'
 import Physics from 'physics'
-import { buildVectorsVariance, rand } from './utils'
+import { rand } from './utils'
 
 export default class EnergySymbolScene {
   /**
@@ -233,8 +233,6 @@ export default class EnergySymbolScene {
   buildFigureBunches (originPoints, variancePoints, massRange, varianceRange, springStrengthRange, sprintDragRange, sprintRestRange) {
     const res = []
 
-    // const varianceVectors = buildVectorsVariance(originPoints, varianceRange)
-
     let mass, coords
 
     for (let i = 0; i < originPoints.length; i++) {
@@ -268,6 +266,7 @@ export default class EnergySymbolScene {
     for (let i = 0; i < count; i++) {
       // выбираем случайно из origin и variance
       const randPoints = bunches.map(b => {
+        // return b.origin.position
         return (rand(-1, 1) > 0) ? b.origin.position : b.variance.position
       })
 
