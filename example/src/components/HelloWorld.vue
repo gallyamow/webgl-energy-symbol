@@ -12,13 +12,13 @@ import {
   SYMBOL_INFO_MICRO
 } from './symbols'
 
-const TRANSFORMING_ENABLED = false
+const TRANSFORMING_ENABLED = true
 
 /**
  * @type {FigureOptions}
  */
 const OPTIONS_FIGURE = {
-  massRange: { min: 2, max: 15 },
+  massRange: { min: 10, max: 10 },
   varianceRange: { min: -10, max: 10 },
 }
 
@@ -34,8 +34,8 @@ const OPTIONS_OUTLINE = [
     color: '#26FFD815',
     thicknessRange: { min: 30, max: 30 },
     translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: 0, max: 0 },
   },
   {
     color: '#0BF0FF',
@@ -53,49 +53,49 @@ const OPTIONS_OUTLINE = [
   },
   {
     color: '#28CBFF',
-    thicknessRange: { min: 2, max: 2},
+    thicknessRange: { min: 2, max: 2 },
     translationRange: { min: -5, max: 5 },
     scaleRange: { min: 0.98, max: 1.01 },
     rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
   },
   {
     color: '#00F0FF',
-    thicknessRange: { min: 2, max: 2},
+    thicknessRange: { min: 2, max: 2 },
     translationRange: { min: -5, max: 5 },
     scaleRange: { min: 0.98, max: 1.01 },
     rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
   },
   {
     color: '#26D8FF0D',
-    thicknessRange: { min: 25, max: 25},
+    thicknessRange: { min: 25, max: 25 },
     translationRange: { min: -5, max: 5 },
     scaleRange: { min: 0.98, max: 1.01 },
     rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
   },
   {
     color: '#26FFD826',
-    thicknessRange: { min: 15, max: 15},
+    thicknessRange: { min: 15, max: 15 },
     translationRange: { min: -5, max: 5 },
     scaleRange: { min: 0.98, max: 1.01 },
     rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
   },
   {
     color: '#0C8A73',
-    thicknessRange: { min: 2, max: 2},
+    thicknessRange: { min: 2, max: 2 },
     translationRange: { min: -5, max: 5 },
     scaleRange: { min: 0.98, max: 1.01 },
     rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
   },
   {
     color: '#00C2FF0D',
-    thicknessRange: { min: 25, max: 25},
+    thicknessRange: { min: 25, max: 25 },
     translationRange: { min: -5, max: 5 },
     scaleRange: { min: 0.98, max: 1.01 },
     rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
   },
   {
     color: '#4FD5FF',
-    thicknessRange: { min: 1, max: 1},
+    thicknessRange: { min: 1, max: 1 },
     translationRange: { min: -5, max: 5 },
     scaleRange: { min: 0.98, max: 1.01 },
     rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
@@ -106,9 +106,9 @@ const OPTIONS_OUTLINE = [
  * @type {SpringOptions}
  */
 const OPTIONS_SPRING = {
-  strengthRange: { min: 0.1, max: 0.5 },
-  dragRange: { min: 0, max: 2 },
-  restRange: { min: 0, max: 1 },
+  strengthRange: { min: 0.1, max: 0.3 },
+  dragRange: { min: 0, max: 0 },
+  restRange: { min: 1, max: 2 },
 }
 
 // moving and scaling depends on current size (30 - columns count)
@@ -137,8 +137,8 @@ export default {
     // noinspection JSCheckFunctionSignatures
     this.energySymbolScene.render(this.$refs.container)
 
-    const originPoints = SYMBOLS_ORIGIN_POINTS[0]
-    const variancePoints = SYMBOLS_VARIANCE_POINTS[0]
+    const originPoints = SYMBOLS_ORIGIN_POINTS[3]
+    const variancePoints = SYMBOLS_VARIANCE_POINTS[3]
 
     this.energySymbolScene.showSymbol(
       originPoints,
