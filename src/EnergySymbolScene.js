@@ -134,21 +134,24 @@ export default class EnergySymbolScene {
    * @return {EnergySymbolScene}
    */
   resize (width, height) {
+    console.log('resize', {width, height})
+
     // TODO: throttle
     this.sceneWidth = width
     this.sceneHeight = height
 
-    this.container.width = this.sceneWidth
-    this.container.height = this.sceneHeight
+    // this.container.width = this.sceneWidth
+    // this.container.height = this.sceneHeight
 
-    this.canvas.width = this.sceneWidth
-    this.canvas.height = this.sceneHeight
-
+    // this.canvas.width = this.sceneWidth
+    // this.canvas.height = this.sceneHeight
+    //
     // this.foreground.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
     // this.background.translation.set(this.sceneWidth / 2, this.sceneHeight / 2)
 
     if (this.rendered) {
-      this.two.update()
+      // this.two.renderer.setSize(this.sceneWidth, this.sceneHeight);
+      // this.two.update()
     }
 
     return this
@@ -245,8 +248,8 @@ export default class EnergySymbolScene {
     for (let i = 0; i < outlineOptions.length; i++) {
       // выбираем случайно из origin и variance
       const randPoints = bunches.map(b => {
-        // return b.origin.position
         return b.origin.position
+        // return b.variance.position
         // return (rand(-1, 1) > 0) ? b.origin.position : b.variance.position
       })
 
