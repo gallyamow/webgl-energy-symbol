@@ -113,16 +113,16 @@ const OPTIONS_SPRING = {
 
 // moving and scaling depends on current size (30 - columns count)
 const SYMBOLS_ORIGIN_POINTS = [
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints'], 1), 1000, 0),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints'], 1), 100, 0),
   moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['originPoints'], 0.7), 1000, 100),
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['originPoints'], 0.8),
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['originPoints'], 0.8),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['originPoints'], 0.8), 100, 100),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['originPoints'], 0.8), 1000, 100)
 ]
 const SYMBOLS_VARIANCE_POINTS = [
-  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints'], 1), 1000, 0),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints'], 1), 100, 0),
   moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['variancePoints'], 0.7), 1000, 100),
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['variancePoints'], 0.8),
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['variancePoints'], 0.8),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['variancePoints'], 0.8), 100, 100),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['variancePoints'], 0.8), 1000, 100)
 ]
 
 export default {

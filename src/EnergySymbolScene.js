@@ -134,7 +134,7 @@ export default class EnergySymbolScene {
    * @return {EnergySymbolScene}
    */
   resize (width, height) {
-    console.log('resize', { width, height })
+    console.log('todo handle resize', { width, height })
 
     // TODO: throttle
     this.sceneWidth = width
@@ -393,8 +393,8 @@ export default class EnergySymbolScene {
       if (distance <= this.mouseDiameter) {
         if (!this.touched[i]) {
           this.touched[i] = {
-            originPosition: { ...origin.position },
-            variancePosition: { ...variance.position },
+            originPosition: origin.position.clone(),
+            variancePosition: variance.position.clone(),
             step: 0
           }
         }
