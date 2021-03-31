@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import { EnergySymbolScene, rand, readSymbolPoints, scaleVectors } from 'webgl-energy-symbol'
+import { EnergySymbolScene, rand, readSymbolPoints, scaleVectors, moveVectors } from 'webgl-energy-symbol'
 import {
   SYMBOL_INFO_TREE,
   SYMBOL_INFO_RING,
@@ -113,13 +113,13 @@ const OPTIONS_SPRING = {
 
 // moving and scaling depends on current size (30 - columns count)
 const SYMBOLS_ORIGIN_POINTS = [
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['originPoints'], 0.8),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['originPoints'], 0.7), 1000, 100),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['originPoints'], 0.8),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['originPoints'], 0.8),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints'], 0.8)
 ]
 const SYMBOLS_VARIANCE_POINTS = [
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['variancePoints'], 0.8),
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['variancePoints'], 0.7), 1000, 100),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['variancePoints'], 0.8),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['variancePoints'], 0.8),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints'], 0.8)

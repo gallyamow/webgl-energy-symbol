@@ -134,7 +134,7 @@ export default class EnergySymbolScene {
    * @return {EnergySymbolScene}
    */
   resize (width, height) {
-    console.log('resize', {width, height})
+    console.log('resize', { width, height })
 
     // TODO: throttle
     this.sceneWidth = width
@@ -317,7 +317,7 @@ export default class EnergySymbolScene {
   }
 
   repairTouched () {
-    // при трансформации не нуно возвращать
+    // при трансформации не нужно возвращать
     if (this.transformingSymbol) {
       this.touched = {}
       return
