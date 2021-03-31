@@ -26,79 +26,79 @@ const OPTIONS_OUTLINE = [
   {
     color: '#09FFF0',
     thicknessRange: { min: 1, max: 1 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#26FFD815',
     thicknessRange: { min: 30, max: 30 },
-    translationRange: { min: -5, max: 5 },
+    translationRange: { min: -2, max: 2 },
     scaleRange: { min: 1, max: 1 },
-    rotationRange: { min: 0, max: 0 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#0BF0FF',
     thicknessRange: { min: 2, max: 2 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#0BF0FF',
     thicknessRange: { min: 1, max: 1 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#28CBFF',
     thicknessRange: { min: 2, max: 2 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#00F0FF',
     thicknessRange: { min: 2, max: 2 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#26D8FF0D',
     thicknessRange: { min: 25, max: 25 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#26FFD826',
     thicknessRange: { min: 15, max: 15 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#0C8A73',
     thicknessRange: { min: 2, max: 2 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#00C2FF0D',
     thicknessRange: { min: 25, max: 25 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
   {
     color: '#4FD5FF',
     thicknessRange: { min: 1, max: 1 },
-    translationRange: { min: -5, max: 5 },
-    scaleRange: { min: 0.98, max: 1.01 },
-    rotationRange: { min: -Math.PI / 150, max: Math.PI / 150 },
+    translationRange: { min: -2, max: 2 },
+    scaleRange: { min: 1, max: 1 },
+    rotationRange: { min: -Math.PI / 300, max: Math.PI / 300 },
   },
 ]
 
@@ -113,16 +113,16 @@ const OPTIONS_SPRING = {
 
 // moving and scaling depends on current size (30 - columns count)
 const SYMBOLS_ORIGIN_POINTS = [
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints'], 1), 1000, 0),
   moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['originPoints'], 0.7), 1000, 100),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['originPoints'], 0.8),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['originPoints'], 0.8),
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['originPoints'], 0.8)
 ]
 const SYMBOLS_VARIANCE_POINTS = [
+  moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints'], 1), 1000, 0),
   moveVectors(scaleVectors(readSymbolPoints(SYMBOL_INFO_TREE)['variancePoints'], 0.7), 1000, 100),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_RING)['variancePoints'], 0.8),
   scaleVectors(readSymbolPoints(SYMBOL_INFO_FAN)['variancePoints'], 0.8),
-  scaleVectors(readSymbolPoints(SYMBOL_INFO_MICRO)['variancePoints'], 0.8)
 ]
 
 export default {
@@ -137,8 +137,8 @@ export default {
     // noinspection JSCheckFunctionSignatures
     this.energySymbolScene.render(this.$refs.container)
 
-    const originPoints = SYMBOLS_ORIGIN_POINTS[3]
-    const variancePoints = SYMBOLS_VARIANCE_POINTS[3]
+    const originPoints = SYMBOLS_ORIGIN_POINTS[0]
+    const variancePoints = SYMBOLS_VARIANCE_POINTS[0]
 
     this.energySymbolScene.showSymbol(
       originPoints,
