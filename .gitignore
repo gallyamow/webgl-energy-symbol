@@ -83,7 +83,7 @@ web_modules/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+# dist - for installing over git
 
 # Gatsby files
 .cache/
@@ -192,9 +192,3 @@ fabric.properties
 # this project
 .DS_Store
 node_modules
-dist
-Будет удалено .gitignore
-Будет удалено README.md
-Будет удалено dist/
-Будет удалено public/
-Будет удалено src/
