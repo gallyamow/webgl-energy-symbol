@@ -10,9 +10,10 @@ export default class EnergySymbolScene {
    * @param {boolean} debugMode
    * @param noSpring
    */
-  constructor (sceneWidth, sceneHeight, mouseDiameter, debugMode = true, noSpring = false) {
+  constructor (sceneWidth, sceneHeight, mouseDiameter, debugMode = true, noSpring = false, noMouseInteraction = false) {
     this.debugMode = debugMode
     this.noSpring = noSpring
+    this.noMouseInteraction = noMouseInteraction
     this.rendered = false
     this.eventTarget = new EventTarget()
     this.sceneWidth = sceneWidth
@@ -341,6 +342,38 @@ export default class EnergySymbolScene {
     }
   }
 
+  doMouseInteraction () {
+    for (let i = 0; i < this.symbol.bunches.length; i++) {
+      const origin = this.symbol.bunches[i].origin
+      const variance = this.symbol.bunches[i].variance
+
+      const a = this.mouse
+      const b = origin
+      const c = variance
+
+      // const tmp = { position: rotateCoords(two.width / 2, two.height / 2, b.position.x, b.position.y, foreground.rotation) }
+      const distance = a.distanceTo(b)
+
+      if (distance <= this.mouseDiameter) {
+        if (!this.touched[i]) {
+          this.touched[i] = {
+            originPosition: origin.position.clone(),
+            variancePosition: variance.position.clone(),
+            step: 0
+          }
+        }
+
+        const jump = (this.mouseDiameter / 2)
+        const t = Math.atan2(b.position.y - a.position.y, b.position.x - a.position.x)
+
+        b.position.x += jump * Math.cos(t)
+        b.position.y += jump * Math.sin(t)
+        c.position.x += jump * Math.cos(t)
+        c.position.y += jump * Math.sin(t)
+      }
+    }
+  }
+
   /**
    * @private
    */
@@ -379,34 +412,8 @@ export default class EnergySymbolScene {
       return
     }
 
-    for (let i = 0; i < this.symbol.bunches.length; i++) {
-      const origin = this.symbol.bunches[i].origin
-      const variance = this.symbol.bunches[i].variance
-
-      const a = this.mouse
-      const b = origin
-      const c = variance
-
-      // const tmp = { position: rotateCoords(two.width / 2, two.height / 2, b.position.x, b.position.y, foreground.rotation) }
-      const distance = a.distanceTo(b)
-
-      if (distance <= this.mouseDiameter) {
-        if (!this.touched[i]) {
-          this.touched[i] = {
-            originPosition: origin.position.clone(),
-            variancePosition: variance.position.clone(),
-            step: 0
-          }
-        }
-
-        const jump = (this.mouseDiameter / 2)
-        const t = Math.atan2(b.position.y - a.position.y, b.position.x - a.position.x)
-
-        b.position.x += jump * Math.cos(t)
-        b.position.y += jump * Math.sin(t)
-        c.position.x += jump * Math.cos(t)
-        c.position.y += jump * Math.sin(t)
-      }
+    if (!this.noMouseInteraction) {
+      this.doMouseInteraction()
     }
   }
 }

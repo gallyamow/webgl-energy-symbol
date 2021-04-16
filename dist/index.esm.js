@@ -119,11 +119,13 @@ var EnergySymbolScene = /*#__PURE__*/function () {
   function EnergySymbolScene(sceneWidth, sceneHeight, mouseDiameter) {
     var debugMode = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
     var noSpring = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+    var noMouseInteraction = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
     _classCallCheck(this, EnergySymbolScene);
 
     this.debugMode = debugMode;
     this.noSpring = noSpring;
+    this.noMouseInteraction = noMouseInteraction;
     this.rendered = false;
     this.eventTarget = new EventTarget();
     this.sceneWidth = sceneWidth;
@@ -427,6 +429,36 @@ var EnergySymbolScene = /*#__PURE__*/function () {
         }
       }
     }
+  }, {
+    key: "doMouseInteraction",
+    value: function doMouseInteraction() {
+      for (var i = 0; i < this.symbol.bunches.length; i++) {
+        var origin = this.symbol.bunches[i].origin;
+        var variance = this.symbol.bunches[i].variance;
+        var a = this.mouse;
+        var b = origin;
+        var c = variance; // const tmp = { position: rotateCoords(two.width / 2, two.height / 2, b.position.x, b.position.y, foreground.rotation) }
+
+        var distance = a.distanceTo(b);
+
+        if (distance <= this.mouseDiameter) {
+          if (!this.touched[i]) {
+            this.touched[i] = {
+              originPosition: origin.position.clone(),
+              variancePosition: variance.position.clone(),
+              step: 0
+            };
+          }
+
+          var jump = this.mouseDiameter / 2;
+          var t = Math.atan2(b.position.y - a.position.y, b.position.x - a.position.x);
+          b.position.x += jump * Math.cos(t);
+          b.position.y += jump * Math.sin(t);
+          c.position.x += jump * Math.cos(t);
+          c.position.y += jump * Math.sin(t);
+        }
+      }
+    }
     /**
      * @private
      */
@@ -472,31 +504,8 @@ var EnergySymbolScene = /*#__PURE__*/function () {
         return;
       }
 
-      for (var i = 0; i < this.symbol.bunches.length; i++) {
-        var origin = this.symbol.bunches[i].origin;
-        var variance = this.symbol.bunches[i].variance;
-        var a = this.mouse;
-        var b = origin;
-        var c = variance; // const tmp = { position: rotateCoords(two.width / 2, two.height / 2, b.position.x, b.position.y, foreground.rotation) }
-
-        var distance = a.distanceTo(b);
-
-        if (distance <= this.mouseDiameter) {
-          if (!this.touched[i]) {
-            this.touched[i] = {
-              originPosition: origin.position.clone(),
-              variancePosition: variance.position.clone(),
-              step: 0
-            };
-          }
-
-          var jump = this.mouseDiameter / 2;
-          var t = Math.atan2(b.position.y - a.position.y, b.position.x - a.position.x);
-          b.position.x += jump * Math.cos(t);
-          b.position.y += jump * Math.sin(t);
-          c.position.x += jump * Math.cos(t);
-          c.position.y += jump * Math.sin(t);
-        }
+      if (!this.noMouseInteraction) {
+        this.doMouseInteraction();
       }
     }
   }]);
